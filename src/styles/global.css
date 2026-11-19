@@ -1190,6 +1190,11 @@ a.media-frame--browser:focus-visible {
   font-size: 14px;
 }
 
+.education a {
+  color: var(--accent);
+  font-weight: 600;
+}
+
 /* ---------- Contact ---------- */
 .contact-panel {
   position: relative;

@@ -80,6 +80,10 @@ const moreWork = [
   },
 ];
 
+// Upwork stats for the credibility strip. Fill these in with the numbers shown on your
+// Upwork profile (e.g. rating: "5.0", jobSuccess: "100%"); leave null to hide them.
+const upwork = { rating: null as string | null, jobSuccess: null as string | null };
+
 // Profiles linked from the contact panel and footer.
 const profiles = [
   { label: "GitHub", href: "https://github.com/Chanuth412-pixel" },
@@ -204,14 +208,23 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
           <span><b>merged open-source PRs</b>Kubescape · Home Assistant · PyPA · Terrakube</span>
           <i aria-hidden="true">↓</i>
         </a>
-        <a href={profiles[2].href} target="_blank" rel="noreferrer">
-          <strong data-count="2">2</strong>
-          <span><b>client projects delivered</b>Reviews on Upwork</span>
+        <a href="https://github.com/kubescape/kubescape/pulls?q=is%3Apr+is%3Amerged+author%3AChanuth412-pixel" target="_blank" rel="noreferrer">
+          <strong data-count="12" data-suffix="k★">12k★</strong>
+          <span><b>Kubescape</b>Largest project I've shipped code to</span>
           <i aria-hidden="true">↗</i>
         </a>
-        <a href={profiles[1].href} target="_blank" rel="noreferrer">
-          <strong data-count="3">3</strong>
-          <span><b>hackathon finals as team lead</b>SLASSCOM · CodeFest · CodeBlast</span>
+        <a href={profiles[2].href} target="_blank" rel="noreferrer">
+          {upwork.rating ? (
+            <>
+              <strong>{upwork.rating}★</strong>
+              <span><b>Upwork rating</b>{upwork.jobSuccess ? `${upwork.jobSuccess} job success · ` : ""}2 client projects</span>
+            </>
+          ) : (
+            <>
+              <strong data-count="2">2</strong>
+              <span><b>client projects delivered</b>Reviews on Upwork</span>
+            </>
+          )}
           <i aria-hidden="true">↗</i>
         </a>
       </section>
@@ -394,7 +407,11 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
           <li>Based in Sri Lanka (UTC+5:30)</li>
           <li>Overlap with Europe and US mornings</li>
         </ul>
-        <p class="education">Computer Engineering undergraduate at the University of Peradeniya.</p>
+        <p class="education">
+          Computer Engineering undergraduate at the University of Peradeniya.
+          Team lead in three hackathon finals: SLASSCOM Xcelerate, SLIIT CodeFest and SLT CodeBlast
+          (<a href={profiles[1].href} target="_blank" rel="noreferrer">LinkedIn ↗</a>).
+        </p>
       </section>
 
       <section class="contact-panel reveal" id="contact">

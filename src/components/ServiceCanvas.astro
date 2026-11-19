@@ -67,7 +67,7 @@ const grafana = logo("Grafana");
         <span class="text">
           <strong>{card.name}</strong>
           <span class="status">
-            <i class="dot"></i><i class="spin"></i><span data-status>Online</span><em>· {card.meta}</em>
+            <i class="spin"></i><span data-status>Online</span><em>· {card.meta}</em>
           </span>
         </span>
       </div>
@@ -252,23 +252,6 @@ const grafana = logo("Grafana");
     font-weight: 500;
   }
 
-  .dot {
-    position: relative;
-    width: 0.55em;
-    height: 0.55em;
-    border-radius: 50%;
-    background: #22c55e;
-  }
-
-  .dot::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background: #22c55e;
-    opacity: 0;
-  }
-
   .spin {
     display: none;
     width: 0.75em;
@@ -288,10 +271,6 @@ const grafana = logo("Grafana");
 
   .card[data-state="deploying"] .status {
     color: #b45309;
-  }
-
-  .card[data-state="deploying"] .dot {
-    display: none;
   }
 
   .card[data-state="deploying"] .spin {
@@ -351,10 +330,6 @@ const grafana = logo("Grafana");
     animation: glide 3.6s cubic-bezier(0.45, 0, 0.4, 1) calc(1.2s + 3.6s * var(--at)) infinite backwards;
   }
 
-  .canvas:global(.is-in) .dot::after {
-    animation: ping 2.4s ease-out calc(1.4s + var(--i) * 0.5s) infinite;
-  }
-
   .canvas:global(.is-in) .spark-scroll {
     animation: scroll 7s linear infinite;
   }
@@ -376,11 +351,6 @@ const grafana = logo("Grafana");
     0% { stroke-dashoffset: 0.14; opacity: 1; }
     22% { stroke-dashoffset: -1; opacity: 1; }
     23%, 100% { stroke-dashoffset: -1; opacity: 0; }
-  }
-
-  @keyframes ping {
-    0% { opacity: 0.55; transform: scale(1); }
-    60%, 100% { opacity: 0; transform: scale(2.6); }
   }
 
   @keyframes scroll {

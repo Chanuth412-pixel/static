@@ -32,7 +32,7 @@ const grafana = logo("Grafana");
       <small>#128 · main · peracom</small>
     </span>
     <span class="elapsed" data-elapsed>{fmt(total)}</span>
-    <span class="state" data-state="success" data-status><i></i><span data-status-label>Success</span></span>
+    <span class="state" data-state="success" data-status><span data-status-label>Success</span></span>
   </div>
 
   <ol class="jobs">
@@ -253,26 +253,15 @@ const grafana = logo("Grafana");
     flex: none;
     align-items: center;
     gap: 6px;
-    padding: 4px 10px 4px 9px;
+    padding: 4px 10px;
     border-radius: 999px;
     font-size: 12.5px;
     font-weight: 500;
   }
 
-  .state i {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: currentColor;
-  }
-
   .state[data-state="running"] {
     background: #fef6e7;
     color: #b45309;
-  }
-
-  .state[data-state="running"] i {
-    animation: blink 1s ease-in-out infinite;
   }
 
   .state[data-state="success"] {
@@ -490,10 +479,6 @@ const grafana = logo("Grafana");
   @keyframes pop {
     from { transform: scale(0.75); }
     to { transform: scale(1); }
-  }
-
-  @keyframes blink {
-    50% { opacity: 0.3; }
   }
 
   /* phones: 2 × 2 jobs, no connectors */

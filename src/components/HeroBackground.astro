@@ -1,0 +1,235 @@
+---
+// Full-width hero backdrop: a slowly drifting gradient (canvas), fine grid lines,
+// two light beams that cross the grid once on load, and a glow that follows the cursor.
+// The canvas pauses when off-screen or when the tab is hidden; reduced motion draws one still frame.
+---
+
+<div class="hero-bg" aria-hidden="true">
+  <canvas class="aurora" data-aurora></canvas>
+  <div class="grid"></div>
+  <span class="beam beam-h"></span>
+  <span class="beam beam-v"></span>
+  <div class="spot"></div>
+  <div class="veil"></div>
+</div>
+
+<script>
+  const canvas = document.querySelector<HTMLCanvasElement>("[data-aurora]");
+  const context = canvas?.getContext("2d");
+
+  if (canvas && context) {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Colour, radius (share of canvas), centre, drift amplitude, drift speed and phase.
+    const blobs = [
+      { c: "91,152,222", r: 0.46, x: 0.74, y: 0.2, ax: 0.1, ay: 0.12, s: 0.00016, p: 0 },
+      { c: "108,99,255", r: 0.38, x: 0.9, y: 0.5, ax: 0.08, ay: 0.12, s: 0.00013, p: 1.7 },
+      { c: "63,184,168", r: 0.32, x: 0.56, y: 0.04, ax: 0.12, ay: 0.08, s: 0.00019, p: 3.1 },
+      { c: "167,139,250", r: 0.3, x: 0.98, y: 0.08, ax: 0.06, ay: 0.1, s: 0.00015, p: 4.2 },
+      { c: "63,120,184", r: 0.36, x: 0.4, y: -0.08, ax: 0.1, ay: 0.06, s: 0.00017, p: 5.3 },
+    ];
+
+    let running = false;
+    let frame = 0;
+
+    const resize = () => {
+      canvas.width = Math.max(1, Math.round(canvas.clientWidth / 6));
+      canvas.height = Math.max(1, Math.round(canvas.clientHeight / 6));
+    };
+
+    const draw = (time: number) => {
+      const { width, height } = canvas;
+      context.clearRect(0, 0, width, height);
+      for (const blob of blobs) {
+        const x = (blob.x + Math.sin(time * blob.s + blob.p) * blob.ax) * width;
+        const y = (blob.y + Math.cos(time * blob.s * 1.3 + blob.p) * blob.ay) * height;
+        const radius = blob.r * Math.max(width, height);
+        const gradient = context.createRadialGradient(x, y, 0, x, y, radius);
+        gradient.addColorStop(0, `rgba(${blob.c},0.6)`);
+        gradient.addColorStop(1, `rgba(${blob.c},0)`);
+        context.fillStyle = gradient;
+        context.fillRect(0, 0, width, height);
+      }
+    };
+
+    let last = 0;
+    const loop = (time: number) => {
+      if (time - last > 33) {
+        draw(time);
+        last = time;
+      }
+      if (running) frame = requestAnimationFrame(loop);
+    };
+
+    const start = () => {
+      if (running || reduce) return;
+      running = true;
+      frame = requestAnimationFrame(loop);
+    };
+
+    const stop = () => {
+      running = false;
+      cancelAnimationFrame(frame);
+    };
+
+    resize();
+    draw(0);
+    window.addEventListener("resize", () => { resize(); draw(performance.now()); });
+
+    if (!reduce) {
+      new IntersectionObserver(([entry]) => (entry.isIntersecting ? start() : stop())).observe(canvas);
+      document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
+    }
+
+    // Cursor glow (desktop pointers only).
+    const hero = canvas.closest<HTMLElement>(".hero");
+    if (hero && !reduce && window.matchMedia("(pointer: fine)").matches) {
+      let pending = false;
+      hero.addEventListener("pointermove", (event) => {
+        if (pending) return;
+        pending = true;
+        requestAnimationFrame(() => {
+          const bounds = hero.getBoundingClientRect();
+          hero.style.setProperty("--mx", `${event.clientX - bounds.left + (window.innerWidth - bounds.width) / 2}px`);
+          hero.style.setProperty("--my", `${event.clientY - bounds.top + 72}px`);
+          hero.classList.add("has-pointer");
+          pending = false;
+        });
+      });
+      hero.addEventListener("pointerleave", () => hero.classList.remove("has-pointer"));
+    }
+  }
+</script>
+
+<style>
+  .hero-bg {
+    position: absolute;
+    top: -72px;
+    bottom: 0;
+    left: 50%;
+    z-index: -1;
+    width: 100vw;
+    margin-left: -50vw;
+    overflow: hidden;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent);
+    mask-image: linear-gradient(to bottom, #000 62%, transparent);
+  }
+
+  .aurora {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.9;
+  }
+
+  .grid {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to right, rgba(31, 48, 71, 0.07) 1px, transparent 1px) 0 0 / 64px 64px,
+      linear-gradient(to bottom, rgba(31, 48, 71, 0.07) 1px, transparent 1px) 0 0 / 64px 64px;
+    -webkit-mask-image: radial-gradient(ellipse 70% 80% at 70% 30%, #000 30%, transparent 75%);
+    mask-image: radial-gradient(ellipse 70% 80% at 70% 30%, #000 30%, transparent 75%);
+  }
+
+  /* Light beams that run along one grid line each, once. */
+  .beam {
+    position: absolute;
+    overflow: hidden;
+    opacity: 0;
+  }
+
+  .beam::after {
+    content: "";
+    position: absolute;
+  }
+
+  .beam-h {
+    top: 256px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+  }
+
+  .beam-h::after {
+    top: 0;
+    left: 0;
+    width: 240px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #5b98de, #a78bfa, transparent);
+    transform: translateX(-240px);
+  }
+
+  .beam-v {
+    top: 0;
+    left: 832px;
+    width: 1px;
+    height: 100%;
+  }
+
+  .beam-v::after {
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 200px;
+    background: linear-gradient(180deg, transparent, #3fb8a8, #5b98de, transparent);
+    transform: translateY(-200px);
+  }
+
+  :global(.js-anim) .beam {
+    opacity: 1;
+  }
+
+  :global(.js-anim) .beam-h::after {
+    animation: beam-x 2.4s cubic-bezier(0.45, 0, 0.2, 1) 0.6s both;
+  }
+
+  :global(.js-anim) .beam-v::after {
+    animation: beam-y 2s cubic-bezier(0.45, 0, 0.2, 1) 1.2s both;
+  }
+
+  .spot {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(520px circle at var(--mx, 70%) var(--my, 30%), rgba(91, 152, 222, 0.16), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  :global(.hero.has-pointer) .spot {
+    opacity: 1;
+  }
+
+  /* Keeps the headline side calm and readable. */
+  .veil {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(251, 253, 255, 0.92) 0%, rgba(251, 253, 255, 0.55) 38%, rgba(251, 253, 255, 0) 62%);
+  }
+
+  :global(.js-anim) .aurora,
+  :global(.js-anim) .grid {
+    animation: bg-in 1.6s ease both;
+  }
+
+  @keyframes bg-in {
+    from { opacity: 0; }
+  }
+
+  @keyframes beam-x {
+    to { transform: translateX(100vw); }
+  }
+
+  @keyframes beam-y {
+    to { transform: translateY(100vh); }
+  }
+
+  @media (max-width: 960px) {
+    .beam-v { display: none; }
+    .veil {
+      background: linear-gradient(180deg, rgba(251, 253, 255, 0.85) 0%, rgba(251, 253, 255, 0.55) 45%, rgba(251, 253, 255, 0.2) 100%);
+    }
+  }
+</style>

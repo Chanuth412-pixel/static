@@ -2,6 +2,7 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import MediaFrame from "../components/MediaFrame.astro";
 import HeroConsole from "../components/HeroConsole.astro";
+import HeroBackground from "../components/HeroBackground.astro";
 
 const base = import.meta.env.BASE_URL;
 
@@ -83,6 +84,11 @@ const processSteps = [
   { title: "Build with regular updates", text: "Short progress updates so you always know where things stand." },
   { title: "Handover with documentation", text: "Working system, documentation and a walkthrough for your team." },
 ];
+const headline = "I build cloud infrastructure and AI automation for startups and small teams."
+  .split(" ")
+  .map((word) => ({ word, accent: word === "AI" || word === "automation" }));
+
+const tools = ["Terraform", "AWS", "Kubernetes", "Ansible", "Proxmox", "Prometheus", "Grafana", "LangGraph", "Ollama", "Python", "Podman", "FreeIPA", "Keycloak", "Astro", "Node.js"];
 ---
 
 <BaseLayout
@@ -102,9 +108,10 @@ const processSteps = [
   <div class="site-shell">
     <main id="main">
       <section class="hero" id="top">
+        <HeroBackground />
         <div class="hero-copy">
           <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span>Available for new projects</p>
-          <h1>I build cloud infrastructure and <span>AI automation</span> for startups and small teams.</h1>
+          <h1 aria-label="I build cloud infrastructure and AI automation for startups and small teams.">{headline.map((item, index) => <><span class:list={["w", item.accent && "accent"]} style={`--w: ${index}`} aria-hidden="true">{item.word}</span>{" "}</>)}</h1>
           <p class="hero-description">Reliable deployments, less manual work and practical systems that your team can understand and maintain.</p>
           <div class="hero-actions">
             <a class="button button-primary" href="#contact">Get a quote <span aria-hidden="true">→</span></a>
@@ -113,14 +120,27 @@ const processSteps = [
           <p class="trust-line">Code merged into <strong>PyPA build</strong> and <strong>Terrakube</strong> · Client work for <strong>Racoona</strong></p>
         </div>
         <div class="hero-visual">
-          <HeroConsole />
+          <div class="tilt" data-tilt>
+            <HeroConsole />
+            <div class="float-badge badge-a"><span class="badge-icon">⬡</span><span><strong>Infrastructure as code</strong><small>Terraform · AWS</small></span></div>
+            <div class="float-badge badge-b"><span class="badge-dot"></span><span><strong>Monitored</strong><small>Prometheus · Grafana</small></span></div>
+          </div>
         </div>
       </section>
 
       <section class="credibility" aria-label="Credibility">
-        <div><strong>5</strong><span>merged open-source PRs<br />PyPA build · Terrakube</span></div>
-        <div><strong>2</strong><span>client projects delivered<br />AI infrastructure · Racoona</span></div>
-        <div><strong>3×</strong><span>hackathon finalist<br />as team lead</span></div>
+        <div><strong data-count="5">5</strong><span>merged open-source PRs<br />PyPA build · Terrakube</span></div>
+        <div><strong data-count="2">2</strong><span>client projects delivered<br />AI infrastructure · Racoona</span></div>
+        <div><strong data-count="3" data-suffix="×">3×</strong><span>hackathon finalist<br />as team lead</span></div>
+      </section>
+
+      <section class="tools" aria-label="Tools I work with">
+        <p>Tools I work with</p>
+        <div class="marquee">
+          <div class="marquee-track">
+            {[...tools, ...tools].map((tool, index) => <span aria-hidden={index >= tools.length ? "true" : undefined}>{tool}</span>)}
+          </div>
+        </div>
       </section>
 
       <section class="section reveal" id="services">
@@ -130,7 +150,7 @@ const processSteps = [
         </div>
         <div class="service-grid" data-stagger>
           {services.map((service) => (
-            <article class="card service-card">
+            <article class="card service-card" data-spotlight>
               <span class="service-icon" aria-hidden="true">
                 {service.icon === "cloud" && (
                   <svg viewBox="0 0 24 24"><path d="M7 18h10a4 4 0 0 0 .6-7.96A6 6 0 0 0 6.1 9.5 4.25 4.25 0 0 0 7 18Z" /></svg>
@@ -196,7 +216,7 @@ const processSteps = [
         </div>
         <div class="pr-list" data-stagger>
           {pullRequests.map(([repo, number, description, href]) => (
-            <a class="pr-row" href={href} target="_blank" rel="noreferrer">
+            <a class="pr-row" data-spotlight href={href} target="_blank" rel="noreferrer">
               <span class="pr-repo">{repo}</span>
               <strong>#{number}</strong>
               <p>{description}</p>

@@ -47,6 +47,7 @@ const lines = [
 
 <style>
   .console {
+    --intro: 1.15s;
     position: relative;
     overflow: hidden;
     background: #16233a;
@@ -116,11 +117,11 @@ const lines = [
   }
 
   .console:global(.is-playing) .live-run {
-    animation: swap-out 0s linear 3.6s forwards;
+    animation: swap-out 0s linear calc(3.6s + var(--intro)) forwards;
   }
 
   .console:global(.is-playing) .live-done {
-    animation: swap-in 0s linear 3.6s forwards;
+    animation: swap-in 0s linear calc(3.6s + var(--intro)) forwards;
   }
 
   @keyframes swap-out {
@@ -250,28 +251,28 @@ const lines = [
   }
 
   .console:global(.is-playing) [data-step] {
-    animation: rise 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) var(--d, 0s) both;
+    animation: rise 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) calc(var(--d, 0s) + var(--intro)) both;
   }
 
   .console:global(.is-playing) .console-steps li span {
-    animation: light 0.4s ease var(--d, 0s) both;
+    animation: light 0.4s ease calc(var(--d, 0s) + var(--intro)) both;
   }
 
   .console:global(.is-playing) .console-progress {
     opacity: 1;
-    animation: fill 2.6s cubic-bezier(0.4, 0, 0.2, 1) 0.9s both;
+    animation: fill 2.6s cubic-bezier(0.4, 0, 0.2, 1) calc(0.9s + var(--intro)) both;
   }
 
   .console:global(.is-playing) .status {
-    animation: pop 0.35s ease var(--d, 0s) both;
+    animation: pop 0.35s ease calc(var(--d, 0s) + var(--intro)) both;
   }
 
   .console:global(.is-playing) .console-live {
-    animation: rise 0.4s ease 0.2s both, finish 0.3s ease 3.6s forwards;
+    animation: rise 0.4s ease calc(0.2s + var(--intro)) both, finish 0.3s ease calc(3.6s + var(--intro)) forwards;
   }
 
   .console:global(.is-playing) .caret {
-    animation: blink 1s steps(2, start) 3.8s 4;
+    animation: blink 1s steps(2, start) calc(3.8s + var(--intro)) 4;
   }
 
   @keyframes rise {

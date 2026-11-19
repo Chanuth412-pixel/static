@@ -146,13 +146,10 @@ const processSteps = [
   { title: "Build with regular updates", text: "Short progress updates so you always know where things stand." },
   { title: "Handover with documentation", text: "Working system, documentation and a walkthrough for your team." },
 ];
-// Two-tone headline: a strong first sentence, then a softer continuation in the same size.
+// Headline: one strong line, then a normal-size sub-line underneath.
 const headlineLead = "Cloud infrastructure and AI automation for growing teams.";
-const headlineRest = "Reliable deployments, less manual work, systems your team can run.";
-const headline = [
-  ...headlineLead.split(" ").map((word) => ({ word, rest: false })),
-  ...headlineRest.split(" ").map((word) => ({ word, rest: true })),
-];
+const headlineSub = "Reliable deployments, less manual work, and systems your team can run.";
+const headline = headlineLead.split(" ");
 
 // Brand marks from simple-icons (CC0). AWS is not in that set, so it gets a plain cloud glyph.
 const cloudPath = "M6.5 19a5 5 0 0 1-.9-9.92A6.5 6.5 0 0 1 18.3 8.6 5.25 5.25 0 0 1 17.75 19Z";
@@ -180,7 +177,8 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
         <HeroRibbon />
         <div class="hero-copy">
           <p class="hero-kicker">Freelance cloud &amp; AI engineer · <span>taking new projects</span></p>
-          <h1 aria-label={`${headlineLead} ${headlineRest}`}>{headline.map((item, index) => <><span class:list={["w", item.rest && "rest"]} style={`--w: ${index}`} aria-hidden="true">{item.word}</span>{" "}</>)}</h1>
+          <h1 aria-label={headlineLead}>{headline.map((word, index) => <><span class="w" style={`--w: ${index}`} aria-hidden="true">{word}</span>{" "}</>)}</h1>
+          <p class="hero-description">{headlineSub}</p>
           <div class="hero-actions">
             <a class="button button-primary" href="#contact">Get a quote <span aria-hidden="true">→</span></a>
             <a class="button button-secondary" href="#work">See my work <span aria-hidden="true">↓</span></a>

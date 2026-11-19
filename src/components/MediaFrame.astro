@@ -13,7 +13,7 @@ interface Props {
 const { src, alt, kind, ratio, poster, visual = "ai" } = Astro.props;
 ---
 
-<div class="media-frame" style={`aspect-ratio: ${ratio}`} data-media>
+<div class:list={["media-frame", !src && "media-frame--visual"]} style={src ? `aspect-ratio: ${ratio}` : undefined} data-media>
   {src ? (
     kind === "video" ? (
       <video src={src} poster={poster} muted loop playsinline preload="none" aria-label={alt}></video>

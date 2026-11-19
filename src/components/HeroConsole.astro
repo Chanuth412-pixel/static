@@ -1,0 +1,310 @@
+---
+// Hero illustration: one agent run, from request to a validated environment.
+// Plays once when the page loads (see motion.ts); shows its final state with reduced motion.
+const steps = ["Understand", "Generate", "Validate"];
+
+const lines = [
+  { text: "Retrieving project context", tool: "RAG", status: "done" },
+  { text: "Generating Terraform", tool: "LLM agent", status: "done" },
+  { text: "terraform validate", tool: "", status: "passed" },
+  { text: "terraform apply", tool: "AWS", status: "complete" },
+];
+---
+
+<div class="console" data-play aria-label="Illustration of an AI agent turning a request into validated infrastructure">
+  <div class="console-bar">
+    <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="console-title">agent-run · staging</span>
+    <span class="console-live" data-step style="--d: 0.2s"><span class="live-run">running</span><span class="live-done">complete</span></span>
+  </div>
+
+  <ol class="console-steps" aria-hidden="true">
+    {steps.map((step, i) => (
+      <li data-step style={`--d: ${0.9 + i * 0.75}s`}>
+        <span>{String(i + 1).padStart(2, "0")}</span>{step}
+      </li>
+    ))}
+    <span class="console-progress" data-step></span>
+  </ol>
+
+  <div class="console-body" aria-hidden="true">
+    <p class="cmd" data-step style="--d: 0.4s">
+      <span class="prompt">$</span> agent run <span class="str">"staging environment on AWS"</span>
+    </p>
+    {lines.map((line, i) => (
+      <p class="line" data-step style={`--d: ${0.9 + i * 0.6}s`}>
+        <span class="arrow">›</span>
+        <span class="line-text">{line.text}</span>
+        {line.tool && <span class="tool">{line.tool}</span>}
+        <span class="status" data-step style={`--d: ${1.25 + i * 0.6}s`}>{line.status}</span>
+      </p>
+    ))}
+    <p class="done" data-step style="--d: 3.5s">
+      <span class="check">✓</span> Environment ready · handover notes written<span class="caret"></span>
+    </p>
+  </div>
+</div>
+
+<style>
+  .console {
+    position: relative;
+    overflow: hidden;
+    background: #16233a;
+    border: 1px solid #22344f;
+    border-radius: 14px;
+    box-shadow:
+      0 30px 60px -28px rgba(22, 35, 58, 0.55),
+      0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+    color: #c9d6e6;
+    font: 13px/1.7 var(--mono);
+  }
+
+  .console-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #22344f;
+    background: #1a2a43;
+  }
+
+  .dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .dots i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #33476a;
+  }
+
+  .console-title {
+    color: #8ea3bf;
+    font-size: 12px;
+  }
+
+  .console-live {
+    margin-left: auto;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(91, 152, 222, 0.14);
+    color: #8fbcf0;
+    font-size: 11px;
+  }
+
+  .console-live {
+    display: inline-grid;
+  }
+
+  .live-run,
+  .live-done {
+    grid-area: 1 / 1;
+  }
+
+  .live-run {
+    visibility: hidden;
+  }
+
+  :global(.js-anim) .live-run {
+    visibility: visible;
+  }
+
+  :global(.js-anim) .live-done {
+    visibility: hidden;
+  }
+
+  .console:global(.is-playing) .live-run {
+    animation: swap-out 0s linear 3.6s forwards;
+  }
+
+  .console:global(.is-playing) .live-done {
+    animation: swap-in 0s linear 3.6s forwards;
+  }
+
+  @keyframes swap-out {
+    to { visibility: hidden; }
+  }
+
+  @keyframes swap-in {
+    to { visibility: visible; }
+  }
+
+  .console-steps {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin: 0;
+    padding: 18px 18px 16px;
+    list-style: none;
+    border-bottom: 1px solid #22344f;
+  }
+
+  .console-steps li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #e5edf6;
+    font: 600 13px/1 Inter Variable, Inter, sans-serif;
+  }
+
+  .console-steps li span {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #2b5f99;
+    color: #fff;
+    font: 600 10px/1 var(--mono);
+  }
+
+  .console-progress {
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: -1px;
+    height: 2px;
+    background: linear-gradient(90deg, #5b98de, #7fc29b);
+    transform-origin: left;
+  }
+
+  .console-body {
+    padding: 16px 18px 20px;
+  }
+
+  .console-body p {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .cmd {
+    margin-bottom: 6px !important;
+    color: #e5edf6;
+  }
+
+  .prompt,
+  .arrow {
+    color: #5b98de;
+  }
+
+  .str {
+    color: #9fd0ae;
+  }
+
+  .line-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tool {
+    padding: 0 6px;
+    border: 1px solid #2c4264;
+    border-radius: 4px;
+    color: #8ea3bf;
+    font-size: 11px;
+  }
+
+  .status {
+    margin-left: auto;
+    color: #7fc29b;
+  }
+
+  .done {
+    margin-top: 10px !important;
+    padding-top: 10px;
+    border-top: 1px dashed #2c4264;
+    color: #e5edf6;
+  }
+
+  .check {
+    color: #7fc29b;
+    font-weight: 600;
+  }
+
+  .caret {
+    display: inline-block;
+    width: 7px;
+    height: 15px;
+    margin-left: 4px;
+    background: #8fbcf0;
+    vertical-align: -2px;
+    opacity: 0;
+  }
+
+  /* Motion: hidden only when JS has enabled animations, revealed once when playing. */
+  :global(.js-anim) .console [data-step] {
+    opacity: 0;
+  }
+
+  :global(.js-anim) .console-steps li span {
+    background: #2a3d5c;
+  }
+
+  :global(.js-anim) .console-progress {
+    transform: scaleX(0);
+  }
+
+  .console:global(.is-playing) [data-step] {
+    animation: rise 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) var(--d, 0s) both;
+  }
+
+  .console:global(.is-playing) .console-steps li span {
+    animation: light 0.4s ease var(--d, 0s) both;
+  }
+
+  .console:global(.is-playing) .console-progress {
+    opacity: 1;
+    animation: fill 2.6s cubic-bezier(0.4, 0, 0.2, 1) 0.9s both;
+  }
+
+  .console:global(.is-playing) .status {
+    animation: pop 0.35s ease var(--d, 0s) both;
+  }
+
+  .console:global(.is-playing) .console-live {
+    animation: rise 0.4s ease 0.2s both, finish 0.3s ease 3.6s forwards;
+  }
+
+  .console:global(.is-playing) .caret {
+    animation: blink 1s steps(2, start) 3.8s 4;
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  @keyframes pop {
+    from { opacity: 0; transform: scale(0.85); }
+    to { opacity: 1; transform: none; }
+  }
+
+  @keyframes light {
+    from { background: #2a3d5c; }
+    to { background: #2b5f99; }
+  }
+
+  @keyframes fill {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+
+  @keyframes finish {
+    to { background: rgba(127, 194, 155, 0.16); color: #9fd0ae; }
+  }
+
+  @keyframes blink {
+    to { opacity: 1; }
+  }
+
+  @media (max-width: 520px) {
+    .console { font-size: 11.5px; }
+    .tool { display: none; }
+    .console-steps li { font-size: 12px; gap: 6px; }
+  }
+</style>

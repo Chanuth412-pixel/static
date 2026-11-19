@@ -1,5 +1,8 @@
 
 ---
+import "@fontsource-variable/inter";
+import "@fontsource/jetbrains-mono/400.css";
+import "@fontsource/jetbrains-mono/600.css";
 import "../styles/global.css";
 
 interface Props {
@@ -41,6 +44,12 @@ const {
       sameAs: ["https://github.com/Chanuth412-pixel"],
       knowsAbout: ["DevOps", "AI automation", "Cloud infrastructure"]
     })} />
+
+    <script is:inline>
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches && "IntersectionObserver" in window) {
+        document.documentElement.classList.add("js-anim");
+      }
+    </script>
 
     <title>{title}</title>
   </head>

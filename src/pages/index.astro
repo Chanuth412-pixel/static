@@ -122,7 +122,7 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
       <section class="hero" id="top">
         <HeroRibbon />
         <div class="hero-copy">
-          <p class="hero-kicker"><span class="status-dot" aria-hidden="true"></span>Freelance cloud &amp; AI engineer · <span>taking new projects</span></p>
+          <p class="hero-kicker">Freelance cloud &amp; AI engineer · <span>taking new projects</span></p>
           <h1 aria-label={`${headlineLead} ${headlineRest}`}>{headline.map((item, index) => <><span class:list={["w", item.rest && "rest"]} style={`--w: ${index}`} aria-hidden="true">{item.word}</span>{" "}</>)}</h1>
           <div class="hero-actions">
             <a class="button button-primary" href="#contact">Get a quote <span aria-hidden="true">→</span></a>
@@ -265,7 +265,7 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
               <span class="pr-repo">{repo}</span>
               <strong>#{number}</strong>
               <p>{description}</p>
-              <em><span aria-hidden="true">●</span> Merged</em>
+              <em>Merged</em>
               <span class="pr-arrow" aria-hidden="true">↗</span>
             </a>
           ))}

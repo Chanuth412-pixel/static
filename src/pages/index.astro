@@ -95,16 +95,16 @@ const linkIcon = (href: string, kind: string) => {
   return null;
 };
 
-// Merged open-source pull requests, newest first. Stars/forks as of Nov 2026.
+// Merged open-source pull requests, newest first. Stars as of Nov 2026.
 const pullRequests = [
-  { repo: "kubescape/kubescape", name: "Kubescape", stars: "12k", lang: "Go", type: "Bug fix", number: 5233, merged: "19 Nov 2026", title: "Report latest-version lookup failures in the installer" },
-  { repo: "kubescape/kubescape", name: "Kubescape", stars: "12k", lang: "Go", type: "Bug fix", number: 5177, merged: "18 Nov 2026", title: "Correct the shell completion instructions" },
-  { repo: "pypa/build", name: "PyPA build", stars: "865", lang: "Python", type: "Bug fix", number: 1283, merged: "18 Nov 2026", title: "Fix the troubleshooting hint when build isolation is disabled" },
-  { repo: "terrakube-io/terrakube", name: "Terrakube", stars: "1k", lang: "Java", type: "Bug fix", number: 3922, merged: "17 Nov 2026", title: "Correctly remove a trailing .git from repository URLs" },
-  { repo: "home-assistant/home-assistant.io", name: "Home Assistant docs", stars: "10.2k", lang: "HTML", type: "Docs", number: 50530, merged: "16 Nov 2026", title: "Fix broken FAQ links" },
-  { repo: "terrakube-io/terrakube", name: "Terrakube", stars: "1k", lang: "Java", type: "Docs", number: 3921, merged: "15 Nov 2026", title: "Fix the telemetry Docker Compose instructions" },
-  { repo: "pypa/build", name: "PyPA build", stars: "865", lang: "Python", type: "Docs", number: 1282, merged: "13 Nov 2026", title: "Update macOS runners in the CI documentation" },
-  { repo: "pypa/build", name: "PyPA build", stars: "865", lang: "Python", type: "Docs", number: 1281, merged: "13 Nov 2026", title: "Fix the missing src directory in the tutorial" },
+  { repo: "kubescape/kubescape", name: "Kubescape", stars: "12k", lang: "Go", number: 5233, title: "Report latest-version lookup failures in the installer" },
+  { repo: "kubescape/kubescape", name: "Kubescape", stars: "12k", lang: "Go", number: 5177, title: "Correct the shell completion instructions" },
+  { repo: "pypa/build", name: "PyPA build", stars: "865", lang: "Python", number: 1283, title: "Fix the troubleshooting hint when build isolation is disabled" },
+  { repo: "terrakube-io/terrakube", name: "Terrakube", stars: "1k", lang: "Java", number: 3922, title: "Correctly remove a trailing .git from repository URLs" },
+  { repo: "home-assistant/home-assistant.io", name: "Home Assistant docs", stars: "10.2k", lang: "HTML", number: 50530, title: "Fix broken FAQ links" },
+  { repo: "terrakube-io/terrakube", name: "Terrakube", stars: "1k", lang: "Java", number: 3921, title: "Fix the telemetry Docker Compose instructions" },
+  { repo: "pypa/build", name: "PyPA build", stars: "865", lang: "Python", number: 1282, title: "Update macOS runners in the CI documentation" },
+  { repo: "pypa/build", name: "PyPA build", stars: "865", lang: "Python", number: 1281, title: "Fix the missing src directory in the tutorial" },
 ].map((pr) => ({ ...pr, href: `https://github.com/${pr.repo}/pull/${pr.number}` }));
 const prProjects = [...new Set(pullRequests.map((pr) => pr.repo))];
 
@@ -360,16 +360,16 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
         </div>
         <div class="pr-list" data-stagger>
           {pullRequests.map((pr) => (
-            <a class="pr-row" data-spotlight href={pr.href} target="_blank" rel="noreferrer" aria-label={`${pr.title} — ${pr.repo} pull request #${pr.number}, merged ${pr.merged}`}>
+            <a class="pr-row" data-spotlight href={pr.href} target="_blank" rel="noreferrer" aria-label={`${pr.title} — ${pr.repo} pull request #${pr.number}, merged`}>
               <span class="pr-repo">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d={linkIcons.github} /></svg>
                 <span>{pr.name}<small>★ {pr.stars} · {pr.lang}</small></span>
               </span>
               <span class="pr-main">
                 <strong>{pr.title}</strong>
-                <small><b class:list={["pr-type", pr.type === "Docs" && "pr-type--docs"]}>{pr.type}</b> #{pr.number}</small>
+                <small>#{pr.number}</small>
               </span>
-              <em>Merged {pr.merged.replace(/ \d{4}$/, "")}</em>
+              <em>Merged</em>
               <span class="pr-arrow" aria-hidden="true">↗</span>
             </a>
           ))}

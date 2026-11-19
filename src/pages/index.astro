@@ -194,9 +194,21 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
       </section>
 
       <section class="credibility" aria-label="Credibility">
-        <div><strong data-count="5">5</strong><span>merged open-source PRs<br />PyPA build · Terrakube</span></div>
-        <div><strong data-count="2">2</strong><span>client projects delivered<br />AI infrastructure · Racoona</span></div>
-        <div><strong data-count="3" data-suffix="×">3×</strong><span>hackathon finalist<br />as team lead</span></div>
+        <a href="#open-source">
+          <strong data-count="5">5</strong>
+          <span><b>merged open-source PRs</b>PyPA build · Terrakube</span>
+          <i aria-hidden="true">↓</i>
+        </a>
+        <a href={profiles[2].href} target="_blank" rel="noreferrer">
+          <strong data-count="2">2</strong>
+          <span><b>client projects delivered</b>Reviews on Upwork</span>
+          <i aria-hidden="true">↗</i>
+        </a>
+        <a href={profiles[1].href} target="_blank" rel="noreferrer">
+          <strong data-count="3">3</strong>
+          <span><b>hackathon finals as team lead</b>SLASSCOM · CodeFest · CodeBlast</span>
+          <i aria-hidden="true">↗</i>
+        </a>
       </section>
 
       <section class="section stack reveal" id="setup">

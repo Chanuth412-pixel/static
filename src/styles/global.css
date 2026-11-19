@@ -526,15 +526,39 @@ a {
   transform: scaleX(1);
 }
 
+.service-card {
+  --tint: 91, 108, 255;
+  display: flex;
+  flex-direction: column;
+  padding: 32px;
+}
+
+.service-card.tone-cloud { --tint: 56, 140, 240; --icon: linear-gradient(140deg, #5cc8ff, #4f63e8); }
+.service-card.tone-ai { --tint: 124, 77, 255; --icon: linear-gradient(140deg, #c48bff, #6d4ef0); }
+.service-card.tone-web { --tint: 20, 170, 150; --icon: linear-gradient(140deg, #4fe0c2, #1f8fd6); }
+
+/* No generic accent bar on service cards; the glow border does that job. */
+.service-card::before {
+  display: none;
+}
+
 .service-icon {
   display: grid;
   place-items: center;
-  width: 46px;
-  height: 46px;
-  margin-bottom: 20px;
-  background: var(--accent-soft);
-  border-radius: 12px;
-  color: var(--accent);
+  width: 48px;
+  height: 48px;
+  margin-bottom: 26px;
+  border-radius: 13px;
+  background: var(--icon);
+  color: #fff;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.45) inset,
+    0 10px 22px -10px rgba(var(--tint), 0.75);
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.service-card:hover .service-icon {
+  transform: translateY(-2px) rotate(-4deg);
 }
 
 .service-icon svg {
@@ -542,13 +566,13 @@ a {
   height: 24px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.8;
+  stroke-width: 1.9;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 .card h3 {
-  margin: 8px 0 10px;
+  margin: 0 0 10px;
   font-size: 22px;
   letter-spacing: -0.02em;
 }
@@ -558,40 +582,86 @@ a {
   color: var(--body);
 }
 
-.service-card ul {
-  display: grid;
-  gap: 9px;
-  margin: 22px 0 0;
+.service-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 26px 0 0;
   padding: 0;
   list-style: none;
-  color: var(--ink);
-  font-size: 15px;
 }
 
-.service-card li {
-  position: relative;
-  padding-left: 24px;
+.service-tools li {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 11px;
+  background: #f6f8fc;
+  border: 1px solid #e6ebf3;
+  border-radius: 8px;
+  color: #3d4d63;
+  font-size: 13px;
+  font-weight: 550;
+  transition: border-color 0.3s ease, background 0.3s ease;
 }
 
-.service-card li::before {
-  content: "";
-  position: absolute;
-  left: 2px;
-  top: 7px;
-  width: 10px;
-  height: 6px;
-  border-left: 2px solid var(--sage);
-  border-bottom: 2px solid var(--sage);
-  transform: rotate(-45deg);
+.service-tools svg {
+  width: 15px;
+  height: 15px;
+  fill: #8494a8;
+  transition: fill 0.3s ease;
+}
+
+.service-card:hover .service-tools li {
+  background: #fff;
+}
+
+.service-card:hover .service-tools svg {
+  fill: var(--brand);
+}
+
+.service-foot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: auto;
+  padding-top: 26px;
 }
 
 .service-time {
+  color: var(--ink);
+  font: 600 15px var(--font);
+}
+
+.service-time span {
   display: block;
-  margin-top: 26px;
-  padding-top: 18px;
-  border-top: 1px solid var(--line);
+  margin-bottom: 2px;
   color: var(--muted);
-  font: 500 13px var(--mono);
+  font: 500 12px var(--mono);
+}
+
+.service-link {
+  color: rgb(var(--tint));
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.service-link span {
+  display: inline-block;
+  transition: transform 0.25s ease;
+}
+
+.service-card:hover .service-link span {
+  transform: translateX(4px);
+}
+
+.service-link:focus-visible {
+  outline: 2px solid rgb(var(--tint));
+  outline-offset: 4px;
+  border-radius: 4px;
 }
 
 /* ---------- Case studies ---------- */
@@ -1198,8 +1268,12 @@ a {
 
 .service-card {
   background:
-    radial-gradient(320px circle at var(--sx, 50%) var(--sy, -20%), rgba(91, 152, 222, 0.07), transparent 70%),
+    radial-gradient(340px circle at var(--sx, 50%) var(--sy, -20%), rgba(var(--tint), 0.07), transparent 70%),
     var(--surface);
+}
+
+.service-card[data-spotlight]::after {
+  background: radial-gradient(260px circle at var(--sx, 50%) var(--sy, 50%), rgba(var(--tint), 0.7), rgba(var(--tint), 0.25) 45%, transparent 70%);
 }
 
 /* Richer primary button */

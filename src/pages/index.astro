@@ -52,30 +52,31 @@ const pullRequests = [
   ["terrakube", "3922", "Fixed repository URL parsing for names and hosts containing .git, with tests.", "https://github.com/terrakube-io/terrakube/pull/3922"],
 ];
 
+// Each service: a short promise, the tools it uses (logos where one exists), and a timeline.
 const services = [
   {
-    label: "Cloud & DevOps",
     title: "Cloud & DevOps setup",
-    who: "For teams that need a dependable path from infrastructure to production.",
-    items: ["Terraform on AWS", "Kubernetes and CI/CD", "Prometheus/Grafana monitoring", "Linux, FreeIPA and Keycloak SSO"],
-    time: "Typically 2–6 weeks",
+    who: "A dependable path from infrastructure to production, defined in code and monitored from day one.",
+    tools: ["Terraform", "AWS", "Kubernetes", "CI/CD", "Prometheus", "Grafana", "Keycloak SSO"],
+    time: "2–6 weeks",
     icon: "cloud",
+    tone: "cloud",
   },
   {
-    label: "AI automation",
     title: "AI automation",
-    who: "For teams connecting useful AI to real infrastructure, workflows and data.",
-    items: ["LLM agents and orchestration", "RAG pipelines with LangGraph and Ollama", "Infrastructure and data integrations", "Validation and operational checks"],
-    time: "Typically 2–6 weeks",
+    who: "Useful AI wired into your real infrastructure, workflows and data, with checks so it stays reliable.",
+    tools: ["LangGraph", "Ollama", "Python", "RAG", "LLM agents", "AWS"],
+    time: "2–6 weeks",
     icon: "agent",
+    tone: "ai",
   },
   {
-    label: "Business websites",
     title: "Business websites",
-    who: "For businesses that need a fast, clear site that turns visits into conversations.",
-    items: ["Astro static sites", "Responsive, accessible UI", "Contact forms", "Email delivery with Web3Forms"],
-    time: "Typically 1–3 weeks",
+    who: "A fast, clear site that loads instantly, works on every screen and turns visits into enquiries.",
+    tools: ["Astro", "Node.js", "Responsive UI", "Contact forms", "Web3Forms"],
+    time: "1–3 weeks",
     icon: "web",
+    tone: "web",
   },
 ];
 
@@ -96,6 +97,7 @@ const headline = [
 // Brand marks from simple-icons (CC0). AWS is not in that set, so it gets a plain cloud glyph.
 const cloudPath = "M6.5 19a5 5 0 0 1-.9-9.92A6.5 6.5 0 0 1 18.3 8.6 5.25 5.25 0 0 1 17.75 19Z";
 const tools = toolIcons.map((tool) => ({ ...tool, path: tool.path ?? cloudPath }));
+const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
 ---
 
 <BaseLayout
@@ -167,7 +169,7 @@ const tools = toolIcons.map((tool) => ({ ...tool, path: tool.path ?? cloudPath }
         </div>
         <div class="service-grid" data-stagger>
           {services.map((service) => (
-            <article class="card service-card" data-spotlight>
+            <article class:list={["card", "service-card", `tone-${service.tone}`]} data-spotlight>
               <span class="service-icon" aria-hidden="true">
                 {service.icon === "cloud" && (
                   <svg viewBox="0 0 24 24"><path d="M7 18h10a4 4 0 0 0 .6-7.96A6 6 0 0 0 6.1 9.5 4.25 4.25 0 0 0 7 18Z" /></svg>
@@ -179,11 +181,23 @@ const tools = toolIcons.map((tool) => ({ ...tool, path: tool.path ?? cloudPath }
                   <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 9h18M7 7h.01M10 7h.01" /></svg>
                 )}
               </span>
-              <p class="card-label">{service.label}</p>
               <h3>{service.title}</h3>
               <p>{service.who}</p>
-              <ul>{service.items.map((item) => <li>{item}</li>)}</ul>
-              <strong class="service-time">{service.time}</strong>
+              <ul class="service-tools" aria-label={`Tools for ${service.title}`}>
+                {service.tools.map((name) => {
+                  const tool = toolByName.get(name);
+                  return (
+                    <li style={tool ? `--brand: ${tool.color}` : undefined}>
+                      {tool && <svg viewBox="0 0 24 24" aria-hidden="true"><path d={tool.path} /></svg>}
+                      {name}
+                    </li>
+                  );
+                })}
+              </ul>
+              <div class="service-foot">
+                <span class="service-time"><span>Typical timeline</span>{service.time}</span>
+                <a class="service-link" href="#contact">Get a quote <span aria-hidden="true">→</span></a>
+              </div>
             </article>
           ))}
         </div>

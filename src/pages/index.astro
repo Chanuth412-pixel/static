@@ -95,13 +95,18 @@ const linkIcon = (href: string, kind: string) => {
   return null;
 };
 
+// Merged open-source pull requests, newest first. Stars/forks as of Nov 2026.
 const pullRequests = [
-  ["pypa/build", "1281", "Fixed the getting-started tutorial command.", "https://github.com/pypa/build/pull/1281"],
-  ["pypa/build", "1282", "Replaced retired macOS runners in the CI guide.", "https://github.com/pypa/build/pull/1282"],
-  ["pypa/build", "1283", "Corrected the build-failure hint when isolation is disabled, with tests.", "https://github.com/pypa/build/pull/1283"],
-  ["terrakube", "3921", "Fixed the telemetry Docker Compose guide.", "https://github.com/terrakube-io/terrakube/pull/3921"],
-  ["terrakube", "3922", "Fixed repository URL parsing for names and hosts containing .git, with tests.", "https://github.com/terrakube-io/terrakube/pull/3922"],
-];
+  { repo: "kubescape/kubescape", name: "Kubescape", stars: "12k", lang: "Go", type: "Bug fix", number: 5233, merged: "19 Nov 2026", title: "Report latest-version lookup failures in the installer" },
+  { repo: "kubescape/kubescape", name: "Kubescape", stars: "12k", lang: "Go", type: "Bug fix", number: 5177, merged: "18 Nov 2026", title: "Correct the shell completion instructions" },
+  { repo: "pypa/build", name: "PyPA build", stars: "865", lang: "Python", type: "Bug fix", number: 1283, merged: "18 Nov 2026", title: "Fix the troubleshooting hint when build isolation is disabled" },
+  { repo: "terrakube-io/terrakube", name: "Terrakube", stars: "1k", lang: "Java", type: "Bug fix", number: 3922, merged: "17 Nov 2026", title: "Correctly remove a trailing .git from repository URLs" },
+  { repo: "home-assistant/home-assistant.io", name: "Home Assistant docs", stars: "10.2k", lang: "HTML", type: "Docs", number: 50530, merged: "16 Nov 2026", title: "Fix broken FAQ links" },
+  { repo: "terrakube-io/terrakube", name: "Terrakube", stars: "1k", lang: "Java", type: "Docs", number: 3921, merged: "15 Nov 2026", title: "Fix the telemetry Docker Compose instructions" },
+  { repo: "pypa/build", name: "PyPA build", stars: "865", lang: "Python", type: "Docs", number: 1282, merged: "13 Nov 2026", title: "Update macOS runners in the CI documentation" },
+  { repo: "pypa/build", name: "PyPA build", stars: "865", lang: "Python", type: "Docs", number: 1281, merged: "13 Nov 2026", title: "Fix the missing src directory in the tutorial" },
+].map((pr) => ({ ...pr, href: `https://github.com/${pr.repo}/pull/${pr.number}` }));
+const prProjects = [...new Set(pullRequests.map((pr) => pr.repo))];
 
 // Each service: a short promise, the tools it uses (logos where one exists), and a timeline.
 const services = [
@@ -176,7 +181,7 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
             <a class="button button-primary" href="#contact">Get a quote <span aria-hidden="true">→</span></a>
             <a class="button button-secondary" href="#work">See my work <span aria-hidden="true">↓</span></a>
           </div>
-          <p class="trust-line">Code merged into <strong>PyPA build</strong> and <strong>Terrakube</strong> · Client work for <strong>Racoona</strong></p>
+          <p class="trust-line">Code merged into <strong>Kubescape</strong>, <strong>Home Assistant</strong>, <strong>PyPA build</strong> and <strong>Terrakube</strong> · Client work for <strong>Racoona</strong></p>
         </div>
       </section>
 
@@ -195,8 +200,8 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
 
       <section class="credibility" aria-label="Credibility">
         <a href="#open-source">
-          <strong data-count="5">5</strong>
-          <span><b>merged open-source PRs</b>PyPA build · Terrakube</span>
+          <strong data-count={pullRequests.length}>{pullRequests.length}</strong>
+          <span><b>merged open-source PRs</b>Kubescape · Home Assistant · PyPA · Terrakube</span>
           <i aria-hidden="true">↓</i>
         </a>
         <a href={profiles[2].href} target="_blank" rel="noreferrer">
@@ -351,15 +356,20 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
       <section class="section band reveal" id="open-source">
         <div class="section-heading">
           <div><p class="eyebrow">Open source</p><h2>Comfortable in other people's codebases.</h2></div>
-          <p>Five merged fixes, reviewed and shipped to each project's own standards.</p>
+          <p>{pullRequests.length} merged fixes across {prProjects.length} projects, from Kubescape (12k★) to Home Assistant, each reviewed against the project's own standards.</p>
         </div>
         <div class="pr-list" data-stagger>
-          {pullRequests.map(([repo, number, description, href]) => (
-            <a class="pr-row" data-spotlight href={href} target="_blank" rel="noreferrer">
-              <span class="pr-repo">{repo}</span>
-              <strong>#{number}</strong>
-              <p>{description}</p>
-              <em>Merged</em>
+          {pullRequests.map((pr) => (
+            <a class="pr-row" data-spotlight href={pr.href} target="_blank" rel="noreferrer" aria-label={`${pr.title} — ${pr.repo} pull request #${pr.number}, merged ${pr.merged}`}>
+              <span class="pr-repo">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d={linkIcons.github} /></svg>
+                <span>{pr.name}<small>★ {pr.stars} · {pr.lang}</small></span>
+              </span>
+              <span class="pr-main">
+                <strong>{pr.title}</strong>
+                <small><b class:list={["pr-type", pr.type === "Docs" && "pr-type--docs"]}>{pr.type}</b> #{pr.number}</small>
+              </span>
+              <em>Merged {pr.merged.replace(/ \d{4}$/, "")}</em>
               <span class="pr-arrow" aria-hidden="true">↗</span>
             </a>
           ))}

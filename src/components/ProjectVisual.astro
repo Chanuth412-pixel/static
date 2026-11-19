@@ -1,12 +1,12 @@
 ---
 // Illustrations shown in place of project screenshots until real media is added.
 // Each one plays a short sequence once when scrolled into view (motion.ts adds .is-playing);
-// the AI one is a looping agent run (AgentRun).
+// the AI one is a looping agent trace (TraceView).
 interface Props {
   kind: "ai" | "platform" | "iot" | "identity" | "research" | "agri" | "web";
 }
 
-import AgentRun from "./AgentRun.astro";
+import TraceView from "./TraceView.astro";
 
 const { kind } = Astro.props;
 
@@ -20,7 +20,7 @@ const pipeline = [
 
 <div class:list={["pv", `pv--${kind}`]} data-play aria-hidden="true">
 
-  {kind === "ai" && <AgentRun />}
+  {kind === "ai" && <TraceView />}
 
   {kind === "web" && (
     <div class="web">

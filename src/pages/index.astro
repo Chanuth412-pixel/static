@@ -24,6 +24,9 @@ const featuredWork = [
     built: "Built and maintained the Astro site with contact forms and Web3Forms email delivery.",
     result: "A lightweight, live website with working contact delivery.",
     visual: "web",
+    // Screenshot of the live homepage, shown in a browser frame. Replace the file to update it.
+    image: "projects/racoona.webp",
+    imageAlt: "Racoona AI homepage: “We Invest in Great Hospitality Businesses”",
     stack: ["Astro", "Web3Forms", "Email delivery"],
     href: "https://racoona.ai/",
   },
@@ -211,7 +214,18 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
         <div class="case-studies">
           {featuredWork.map((project, index) => (
             <article class:list={["case-study", index % 2 ? "case-study-reverse" : ""]}>
-              <MediaFrame kind="image" ratio="16/11" alt={`${project.title} system illustration`} visual={project.visual} />
+              {project.image ? (
+                <MediaFrame
+                  kind="image"
+                  ratio="16/11"
+                  src={`${base}${project.image}`}
+                  alt={project.imageAlt ?? `${project.title} website`}
+                  browser={project.href?.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+                  href={project.href}
+                />
+              ) : (
+                <MediaFrame kind="image" ratio="16/11" alt={`${project.title} system illustration`} visual={project.visual} />
+              )}
               <div class="case-copy">
                 <p class="card-label">{project.context}</p>
                 <h3>{project.title}</h3>

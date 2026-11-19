@@ -8,10 +8,38 @@ interface Props {
   ratio: string;
   poster?: string;
   visual?: "ai" | "platform" | "iot" | "identity" | "research" | "agri" | "web";
+  /** Show the image inside a browser window with this address (e.g. a website screenshot). */
+  browser?: string;
+  /** Make the browser frame a link to the live site. */
+  href?: string;
 }
 
-const { src, alt, kind, ratio, poster, visual = "ai" } = Astro.props;
+const { src, alt, kind, ratio, poster, visual = "ai", browser, href } = Astro.props;
+const Wrapper = href ? "a" : "div";
 ---
+
+{browser && src ? (
+  <Wrapper
+    class="media-frame media-frame--browser"
+    href={href}
+    target={href ? "_blank" : undefined}
+    rel={href ? "noreferrer" : undefined}
+    aria-label={href ? `${alt} (opens the live site)` : undefined}
+    data-media
+  >
+    <span class="browser-bar" aria-hidden="true">
+      <span class="browser-dots"><i></i><i></i><i></i></span>
+      <span class="browser-url">
+        <svg viewBox="0 0 16 16"><rect x="3.5" y="7" width="9" height="6.5" rx="1.5" /><path d="M5.5 7V5.2a2.5 2.5 0 0 1 5 0V7" /></svg>
+        {browser}
+      </span>
+      {href && <span class="browser-open">Visit ↗</span>}
+    </span>
+    <span class="browser-view">
+      <img src={src} alt={alt} loading="lazy" decoding="async" />
+    </span>
+  </Wrapper>
+) : (
 
 <div class:list={["media-frame", !src && "media-frame--visual"]} style={src ? `aspect-ratio: ${ratio}` : undefined} data-media>
   {src ? (
@@ -24,3 +52,4 @@ const { src, alt, kind, ratio, poster, visual = "ai" } = Astro.props;
     <ProjectVisual kind={visual} />
   )}
 </div>
+)}

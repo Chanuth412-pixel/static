@@ -1,21 +1,16 @@
 ---
 // Illustrations shown in place of project screenshots until real media is added.
 // Each one plays a short sequence once when scrolled into view (motion.ts adds .is-playing);
-// the AI one is a looping deployment card (DeployCard).
+// the AI one is a looping deployment card (DeployCard), the platform one a pipeline run (PipelineRun).
 interface Props {
   kind: "ai" | "platform" | "iot" | "identity" | "research" | "agri" | "web";
 }
 
 import DeployCard from "./DeployCard.astro";
+import PipelineRun from "./PipelineRun.astro";
 
 const { kind } = Astro.props;
 
-const pipeline = [
-  { name: "Proxmox", role: "VMs" },
-  { name: "Terraform", role: "Provision" },
-  { name: "Ansible", role: "Configure" },
-  { name: "Kubernetes", role: "Deploy" },
-];
 ---
 
 <div class:list={["pv", `pv--${kind}`]} data-play aria-hidden="true">
@@ -59,31 +54,7 @@ const pipeline = [
     </div>
   )}
 
-  {kind === "platform" && (
-    <div class="platform">
-      <div class="stages">
-        {pipeline.map((stage, i) => (
-          <div class="stage" data-step style={`--d: ${0.2 + i * 0.5}s`}>
-            <span class="stage-index">{String(i + 1).padStart(2, "0")}</span>
-            <strong>{stage.name}</strong>
-            <small>{stage.role}</small>
-          </div>
-        ))}
-        <span class="track"><span class="track-fill"></span></span>
-      </div>
-      <div class="monitor" data-step style="--d: 2.2s">
-        <div class="monitor-head">
-          <span>Prometheus · Grafana</span>
-          <span class="healthy" data-step style="--d: 3.4s">● healthy</span>
-        </div>
-        <svg viewBox="0 0 320 90" preserveAspectRatio="none">
-          <path class="grid" d="M0 22H320M0 45H320M0 68H320" />
-          <path class="area" d="M0 70 L32 62 L64 66 L96 48 L128 52 L160 38 L192 44 L224 30 L256 34 L288 26 L320 28 L320 90 L0 90Z" />
-          <path class="line" pathLength="1" d="M0 70 L32 62 L64 66 L96 48 L128 52 L160 38 L192 44 L224 30 L256 34 L288 26 L320 28" />
-        </svg>
-      </div>
-    </div>
-  )}
+  {kind === "platform" && <PipelineRun />}
 
   {kind !== "ai" && kind !== "web" && kind !== "platform" && (
     <div class="simple">
@@ -297,105 +268,6 @@ const pipeline = [
     font-size: 10.5px;
   }
 
-  /* Platform */
-  .platform {
-    display: grid;
-    gap: 18px;
-  }
-
-  .stages {
-    position: relative;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    padding-bottom: 14px;
-  }
-
-  .stage {
-    padding: 10px;
-    background: #fff;
-    border: 1px solid #d3dfec;
-    border-radius: 10px;
-    text-align: center;
-  }
-
-  .stage-index {
-    color: var(--accent);
-    font-size: 10px;
-  }
-
-  .stage strong {
-    display: block;
-    margin-top: 2px;
-    color: var(--ink);
-    font: 600 13px/1.3 "Inter Variable", Inter, sans-serif;
-  }
-
-  .stage small {
-    color: #60758b;
-    font-size: 10px;
-  }
-
-  .track {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 4px;
-    overflow: hidden;
-    border-radius: 2px;
-    background: #dbe5f0;
-  }
-
-  .track-fill {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, var(--accent), var(--sage));
-    transform-origin: left;
-  }
-
-  .monitor {
-    padding: 12px 14px 8px;
-    background: #fff;
-    border: 1px solid #d3dfec;
-    border-radius: 12px;
-  }
-
-  .monitor-head {
-    display: flex;
-    justify-content: space-between;
-    color: #60758b;
-    font-size: 11px;
-  }
-
-  .healthy {
-    color: var(--sage);
-  }
-
-  .monitor svg {
-    display: block;
-    width: 100%;
-    height: 90px;
-    margin-top: 6px;
-  }
-
-  .grid {
-    stroke: #edf2f7;
-    stroke-width: 1;
-  }
-
-  .area {
-    fill: rgba(63, 120, 184, 0.08);
-  }
-
-  .line {
-    fill: none;
-    stroke: var(--accent);
-    stroke-width: 2.5;
-    stroke-linejoin: round;
-    stroke-dasharray: 1;
-  }
-
   .simple {
     color: #60758b;
     text-align: center;
@@ -407,41 +279,12 @@ const pipeline = [
     opacity: 0;
   }
 
-  :global(.js-anim) .pv .track-fill {
-    transform: scaleX(0);
-  }
-
-  :global(.js-anim) .pv .line {
-    stroke-dashoffset: 1;
-  }
-
-  :global(.js-anim) .pv .area {
-    opacity: 0;
-  }
-
   .pv:global(.is-playing) [data-step] {
     animation: pv-rise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) var(--d, 0s) both;
   }
 
-  .pv:global(.is-playing) .toast,
-  .pv:global(.is-playing) .healthy {
+  .pv:global(.is-playing) .toast {
     animation: pv-pop 0.45s cubic-bezier(0.3, 1.4, 0.5, 1) var(--d, 0s) both;
-  }
-
-  .pv:global(.is-playing) .stage {
-    animation: pv-rise 0.45s ease var(--d, 0s) both, pv-lit 0.4s ease calc(var(--d, 0s) + 0.25s) forwards;
-  }
-
-  .pv:global(.is-playing) .track-fill {
-    animation: pv-fill 2s cubic-bezier(0.45, 0, 0.25, 1) 0.2s both;
-  }
-
-  .pv:global(.is-playing) .line {
-    animation: pv-draw 1.2s ease 2.4s both;
-  }
-
-  .pv:global(.is-playing) .area {
-    animation: pv-fade 0.8s ease 3s both;
   }
 
   @keyframes pv-rise {
@@ -454,28 +297,8 @@ const pipeline = [
     to { opacity: 1; transform: none; }
   }
 
-  @keyframes pv-lit {
-    to { border-color: #9bbbe0; background: #f2f8fe; }
-  }
-
-  @keyframes pv-fill {
-    from { transform: scaleX(0); }
-    to { transform: scaleX(1); }
-  }
-
-  @keyframes pv-draw {
-    from { stroke-dashoffset: 1; }
-    to { stroke-dashoffset: 0; }
-  }
-
-  @keyframes pv-fade {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
   @media (max-width: 520px) {
     .pv { padding: 18px; }
-    .stages { grid-template-columns: repeat(2, 1fr); }
     .toast { right: 0; }
   }
 </style>

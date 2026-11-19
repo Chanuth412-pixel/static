@@ -1,0 +1,515 @@
+---
+// Project illustration: one run of the platform pipeline, in the style of a CI workflow graph.
+// Four jobs (Proxmox → Terraform → Ansible → Kubernetes) run one after another, each
+// showing a spinner, then a check and its duration; a monitoring strip confirms the cluster.
+// Loops while on screen. The HTML is the finished run (no-JS / reduced motion).
+import toolIcons from "../data/tools.json";
+
+const logo = (name: string) => toolIcons.find((tool) => tool.name === name);
+
+// Durations in seconds as shown on the card.
+const jobs = [
+  { name: "Proxmox", task: "create VMs", seconds: 42, icon: logo("Proxmox") },
+  { name: "Terraform", task: "apply", seconds: 65, icon: logo("Terraform") },
+  { name: "Ansible", task: "configure", seconds: 130, icon: logo("Ansible") },
+  { name: "Kubernetes", task: "deploy", seconds: 88, icon: logo("Kubernetes") },
+];
+
+const fmt = (seconds: number) => `${Math.floor(seconds / 60)}m ${String(seconds % 60).padStart(2, "0")}s`;
+const total = jobs.reduce((sum, job) => sum + job.seconds, 0);
+const grafana = logo("Grafana");
+---
+
+<div class="pipeline" data-pipeline>
+  <span class="progress" data-progress aria-hidden="true"></span>
+
+  <div class="head">
+    <span class="mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.4" /><circle cx="18" cy="12" r="2.4" /><circle cx="6" cy="18" r="2.4" /><path d="M8.4 6h3.1a3 3 0 0 1 3 3v.6M8.4 18h3.1a3 3 0 0 0 3-3v-.6" /></svg>
+    </span>
+    <span class="title">
+      <strong>platform-deploy</strong>
+      <small>#128 · main · peracom</small>
+    </span>
+    <span class="elapsed" data-elapsed>{fmt(total)}</span>
+    <span class="state" data-state="success" data-status><i></i><span data-status-label>Success</span></span>
+  </div>
+
+  <ol class="jobs">
+    {jobs.map((job) => (
+      <li class="job" data-job data-state="done" data-seconds={job.seconds}>
+        <span class="job-top">
+          <span class="logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d={job.icon?.path} fill={job.icon?.color} /></svg>
+          </span>
+          <span class="icon" aria-hidden="true">
+            <svg class="check" viewBox="0 0 16 16"><path d="m4 8.5 2.5 2.5L12 5.5" /></svg>
+          </span>
+        </span>
+        <strong>{job.name}</strong>
+        <small>{job.task}</small>
+        <span class="time" data-time>{fmt(job.seconds)}</span>
+      </li>
+    ))}
+  </ol>
+
+  <div class="monitor">
+    <span class="logo logo-sm" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d={grafana?.path} fill={grafana?.color} /></svg>
+    </span>
+    <span class="monitor-text">
+      <strong>Cluster</strong>
+      <small data-health>6/6 nodes healthy</small>
+    </span>
+    <svg class="spark" viewBox="0 0 120 24" preserveAspectRatio="none" aria-hidden="true">
+      <g class="spark-scroll">
+        <path d="M0 17 L10 14 L20 16 L30 10 L40 12 L50 7 L60 11 L70 8 L80 13 L90 10 L100 15 L110 12 L120 17 L130 14 L140 16 L150 10 L160 12 L170 7 L180 11 L190 8 L200 13 L210 10 L220 15 L230 12 L240 17" />
+      </g>
+    </svg>
+  </div>
+</div>
+
+<script>
+  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+  const fmt = (seconds: number) => {
+    const s = Math.floor(seconds);
+    return `${Math.floor(s / 60)}m ${String(s % 60).padStart(2, "0")}s`;
+  };
+
+  document.querySelectorAll<HTMLElement>("[data-pipeline]").forEach((root) => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      root.classList.add("is-in");
+      return;
+    }
+
+    const jobs = Array.from(root.querySelectorAll<HTMLElement>("[data-job]")).map((row) => ({
+      row,
+      seconds: Number(row.dataset.seconds),
+      time: row.querySelector<HTMLElement>("[data-time]")!,
+    }));
+    const status = root.querySelector<HTMLElement>("[data-status]")!;
+    const statusLabel = root.querySelector<HTMLElement>("[data-status-label]")!;
+    const elapsed = root.querySelector<HTMLElement>("[data-elapsed]")!;
+    const progress = root.querySelector<HTMLElement>("[data-progress]")!;
+    const health = root.querySelector<HTMLElement>("[data-health]")!;
+    const total = jobs.reduce((sum, job) => sum + job.seconds, 0);
+    const MS_PER_SECOND = 15; // ~5s of real time for the whole run
+    let run = 0;
+
+    const play = (index: number, live: () => boolean) =>
+      new Promise<void>((resolve) => {
+        const job = jobs[index];
+        const before = jobs.slice(0, index).reduce((sum, j) => sum + j.seconds, 0);
+        const duration = job.seconds * MS_PER_SECOND;
+        const start = performance.now();
+        const tick = (now: number) => {
+          if (!live()) return resolve();
+          const p = Math.min(1, (now - start) / duration);
+          job.time.textContent = fmt(job.seconds * p);
+          elapsed.textContent = fmt(before + job.seconds * p);
+          progress.style.transform = `scaleX(${(before + job.seconds * p) / total})`;
+          if (p < 1) requestAnimationFrame(tick);
+          else resolve();
+        };
+        requestAnimationFrame(tick);
+      });
+
+    const cycle = async (id: number) => {
+      const live = () => id === run;
+      root.classList.add("is-running");
+      status.dataset.state = "running";
+      statusLabel.textContent = "In progress";
+      health.textContent = "waiting for rollout";
+      elapsed.textContent = fmt(0);
+      progress.style.transform = "scaleX(0)";
+      jobs.forEach((job) => {
+        job.row.dataset.state = "queued";
+        job.time.textContent = "—";
+      });
+      await sleep(600);
+
+      for (const [index, job] of jobs.entries()) {
+        if (!live()) return;
+        job.row.dataset.state = "active";
+        await play(index, live);
+        if (!live()) return;
+        job.row.dataset.state = "done";
+        await sleep(160);
+      }
+
+      status.dataset.state = "success";
+      statusLabel.textContent = "Success";
+      health.textContent = "6/6 nodes healthy";
+      root.classList.remove("is-running");
+      await sleep(3800);
+      if (live()) cycle(id);
+    };
+
+    new IntersectionObserver(([entry]) => {
+      run += 1;
+      if (entry.isIntersecting) {
+        root.classList.add("is-in");
+        cycle(run);
+      }
+    }, { threshold: 0.4 }).observe(root);
+  });
+</script>
+
+<style>
+  .pipeline {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 500px;
+    padding: 6px;
+    background: #fff;
+    border: 1px solid #e6e9ef;
+    border-radius: 14px;
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.04),
+      0 24px 48px -30px rgba(15, 23, 42, 0.35);
+    color: #111827;
+    font-family: var(--font);
+    transition: opacity 0.7s ease, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  :global(.js-anim) .pipeline:not(:global(.is-in)) {
+    opacity: 0;
+    transform: translateY(22px) scale(0.98);
+  }
+
+  .progress {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 2px;
+    background: linear-gradient(90deg, #111827, #6366f1 70%, #22c55e);
+    transform-origin: left;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .pipeline:global(.is-running) .progress {
+    opacity: 1;
+  }
+
+  /* header */
+  .head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 14px 16px;
+  }
+
+  .mark {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #111827;
+    color: #fff;
+  }
+
+  .mark svg {
+    width: 19px;
+    height: 19px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+  }
+
+  .title {
+    display: grid;
+    min-width: 0;
+  }
+
+  .title strong {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .title small {
+    overflow: hidden;
+    color: #6b7280;
+    font: 12px var(--mono);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .elapsed {
+    margin-left: auto;
+    color: #9ca3af;
+    font: 12px var(--mono);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .state {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px 4px 9px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 500;
+  }
+
+  .state i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .state[data-state="running"] {
+    background: #fef6e7;
+    color: #b45309;
+  }
+
+  .state[data-state="running"] i {
+    animation: blink 1s ease-in-out infinite;
+  }
+
+  .state[data-state="success"] {
+    background: #e9f8ef;
+    color: #15803d;
+  }
+
+  :global(.is-in) .state[data-state="success"] {
+    animation: pop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1);
+  }
+
+  /* jobs: a row of cards joined by a line */
+  .jobs {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin: 0;
+    padding: 14px;
+    list-style: none;
+    background: #fafbfc;
+    border: 1px solid #eef0f4;
+    border-radius: 10px;
+  }
+
+  .job {
+    position: relative;
+    display: grid;
+    gap: 2px;
+    padding: 11px 11px 10px;
+    background: #fff;
+    border: 1px solid #e6e9ef;
+    border-radius: 9px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    transition: opacity 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  /* connector to the next job */
+  .job:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: -15px;
+    width: 15px;
+    height: 1.5px;
+    background: #d5dbe5;
+    transition: background 0.3s ease;
+  }
+
+  .job[data-state="done"]:not(:last-child)::after {
+    background: #111827;
+  }
+
+  .job[data-state="queued"] {
+    opacity: 0.45;
+  }
+
+  .job[data-state="active"] {
+    border-color: #c7cbf7;
+    box-shadow:
+      0 0 0 3px rgba(99, 102, 241, 0.12),
+      0 8px 18px -12px rgba(15, 23, 42, 0.4);
+    transform: translateY(-2px);
+  }
+
+  .job-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .logo {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    background: #fff;
+    border: 1px solid #edf0f5;
+    border-radius: 7px;
+  }
+
+  .logo svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .icon {
+    display: grid;
+    place-items: center;
+    width: 17px;
+    height: 17px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 50%;
+    transition: background 0.25s ease, border-color 0.25s ease;
+  }
+
+  .job[data-state="active"] .icon {
+    border-color: #e5e7eb;
+    border-top-color: #4f46e5;
+    animation: spin 0.8s linear infinite;
+  }
+
+  .job[data-state="done"] .icon {
+    background: #111827;
+    border-color: #111827;
+  }
+
+  :global(.is-in) .job[data-state="done"] .icon {
+    animation: pop 0.35s cubic-bezier(0.3, 1.6, 0.5, 1);
+  }
+
+  .check {
+    width: 10px;
+    height: 10px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 12;
+    stroke-dashoffset: 12;
+  }
+
+  .job[data-state="done"] .check {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.3s ease 0.05s;
+  }
+
+  .job strong {
+    overflow: hidden;
+    font-size: 13px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .job small {
+    overflow: hidden;
+    color: #9ca3af;
+    font: 11px var(--mono);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .time {
+    margin-top: 6px;
+    color: #6b7280;
+    font: 11px var(--mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .job[data-state="active"] .time {
+    color: #4f46e5;
+  }
+
+  /* monitoring strip */
+  .monitor {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 14px 10px;
+  }
+
+  .logo-sm {
+    flex: none;
+  }
+
+  .monitor-text {
+    display: grid;
+  }
+
+  .monitor-text strong {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .monitor-text small {
+    color: #15803d;
+    font: 11.5px var(--mono);
+    transition: color 0.3s ease;
+  }
+
+  .pipeline:global(.is-running) .monitor-text small {
+    color: #9ca3af;
+  }
+
+  .spark {
+    flex: 1;
+    height: 26px;
+    min-width: 60px;
+    overflow: hidden;
+  }
+
+  .spark path {
+    fill: none;
+    stroke: #f46800;
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  :global(.is-in) .spark-scroll {
+    animation: scroll 7s linear infinite;
+  }
+
+  @keyframes scroll {
+    to { transform: translateX(-120px); }
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes pop {
+    from { transform: scale(0.75); }
+    to { transform: scale(1); }
+  }
+
+  @keyframes blink {
+    50% { opacity: 0.3; }
+  }
+
+  /* phones: 2 × 2 jobs, no connectors */
+  @media (max-width: 560px) {
+    .jobs {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      padding: 10px;
+    }
+
+    .job::after {
+      display: none;
+    }
+
+    .elapsed {
+      display: none;
+    }
+  }
+</style>

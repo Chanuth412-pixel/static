@@ -1,7 +1,9 @@
 ---
 // Hero illustration: a small cloud setup drawn in isometric view.
-// On load the parts drop in one by one, the connections draw, then requests flow
-// through as pulses. Pulses pause when off-screen; reduced motion shows a still frame.
+// On load the parts drop in one by one and the connections appear. Then requests travel
+// as light streaks: users → load balancer → pod → database, and the response returns in green.
+// Each part lights up as traffic reaches it; the two pods take turns.
+// Paused when off-screen; with reduced motion the diagram stays still.
 
 type Box = { id: string; cx: number; cy: number; a: number; h: number; tone: "base" | "accent" | "green" };
 
@@ -27,22 +29,58 @@ const labels = [
   { x: 112, y: 366, title: "PostgreSQL", sub: "managed database", delay: 1.0 },
 ];
 
-// Connections, drawn after the parts land; pulses travel along them.
-const links = [
-  { id: "l-users", d: "M260 46 L260 92" },
-  { id: "l-a", d: "M236 150 C214 170 196 176 184 194" },
-  { id: "l-b", d: "M284 150 C306 170 324 176 336 194" },
-  { id: "l-da", d: "M184 270 C206 300 230 306 248 320" },
-  { id: "l-db", d: "M336 270 C314 300 290 306 272 320" },
+// Connections run from the edge of one part to the edge of the next, so every hop is visible.
+const links = {
+  uLb: "M260 48 L260 94",
+  lbA: "M229 163 C214 178 204 192 196 209",
+  lbB: "M291 163 C306 178 316 192 324 209",
+  aDb: "M196 273 C206 296 222 314 240 326",
+  bDb: "M324 273 C314 296 298 314 280 326",
+};
+
+// Reverse a "M x y C ... x y" / "M x y L x y" path so a response can travel back up.
+const reverse = (d: string) => {
+  const n = d.match(/-?\d+(\.\d+)?/g)!.map(Number);
+  const pts: number[][] = [];
+  for (let i = 0; i < n.length; i += 2) pts.push([n[i], n[i + 1]]);
+  pts.reverse();
+  const [first, ...rest] = pts;
+  return d.includes("C")
+    ? `M${first.join(" ")} C${rest.map((p) => p.join(" ")).join(" ")}`
+    : `M${first.join(" ")} L${rest[0].join(" ")}`;
+};
+
+// One request's journey, as fractions of the cycle: request hops down, the database
+// works, the response hops back up. Two routes take turns, half a cycle apart.
+const routes = [
+  { pod: "A", offset: 0, request: "GET /orders", response: "200 OK · 38 ms" },
+  { pod: "B", offset: 0.5, request: "GET /products", response: "200 OK · 41 ms" },
 ];
 
-const pulses = [
-  { path: "l-users", dur: 2.2, begin: 3.0 },
-  { path: "l-a", dur: 2.2, begin: 3.5 },
-  { path: "l-b", dur: 2.2, begin: 4.2 },
-  { path: "l-da", dur: 2.2, begin: 4.0 },
-  { path: "l-db", dur: 2.2, begin: 4.7 },
-];
+const beams = routes.flatMap((route) => {
+  const toPod = route.pod === "A" ? links.lbA : links.lbB;
+  const toDb = route.pod === "A" ? links.aDb : links.bDb;
+  return [
+    { d: links.uLb, at: 0.0, kind: "request" },
+    { d: toPod, at: 0.1, kind: "request" },
+    { d: toDb, at: 0.2, kind: "request" },
+    { d: reverse(toDb), at: 0.36, kind: "response" },
+    { d: reverse(toPod), at: 0.46, kind: "response" },
+    { d: reverse(links.uLb), at: 0.56, kind: "response" },
+  ].map((beam) => ({ ...beam, at: beam.at + route.offset }));
+});
+
+// Moments when a part lights up (a request or response reaches it).
+const hits = routes.flatMap((route) => [
+  { node: "lb", at: route.offset + 0.08 },
+  { node: "lb", at: route.offset + 0.54 },
+  { node: `pod${route.pod}`, at: route.offset + 0.18 },
+  { node: `pod${route.pod}`, at: route.offset + 0.44 },
+  { node: "db", at: route.offset + 0.28, long: true },
+  { node: "users", at: route.offset + 0.64 },
+]);
+
+const tagWidth = (text: string) => Math.round(text.length * 6.4 + 16);
 ---
 
 <div class="infra" data-play data-infra>
@@ -51,15 +89,6 @@ const pulses = [
     <desc id="infra-desc">Users reach a load balancer, which routes requests to two Kubernetes pods backed by a PostgreSQL database, with monitoring.</desc>
 
     <defs>
-      <linearGradient id="g-link" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#7c6cff" />
-        <stop offset="1" stop-color="#3fa9c9" />
-      </linearGradient>
-      <radialGradient id="g-pulse">
-        <stop offset="0" stop-color="#ffffff" />
-        <stop offset="0.35" stop-color="#8f7bff" />
-        <stop offset="1" stop-color="#8f7bff" stop-opacity="0" />
-      </radialGradient>
       <linearGradient id="g-floor" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0" stop-color="#ffffff" stop-opacity="0.9" />
         <stop offset="1" stop-color="#eef3fb" stop-opacity="0.75" />
@@ -70,7 +99,6 @@ const pulses = [
       <clipPath id="c-floor">
         <polygon points="260,96 486,226 260,356 34,226" />
       </clipPath>
-      {links.map((link) => <path id={link.id} d={link.d} />)}
     </defs>
 
     <!-- floor -->
@@ -79,18 +107,31 @@ const pulses = [
       <rect x="0" y="80" width="520" height="300" fill="url(#g-grid)" clip-path="url(#c-floor)" opacity="0.7" />
     </g>
 
-    <!-- connections -->
+    <!-- connections (tracks) and the light streaks that travel along them -->
     <g class="links">
-      {links.map((link, i) => (
-        <use href={`#${link.id}`} class="link" style={`--d: ${1.2 + i * 0.12}s`} />
+      {Object.values(links).map((d, i) => (
+        <path d={d} class="link" style={`--d: ${1.2 + i * 0.1}s`} />
+      ))}
+    </g>
+
+    <g class="flow">
+      {beams.map((beam) => (
+        <g class:list={["beam", `beam-${beam.kind}`]} style={`--at: ${beam.at}`}>
+          <path d={beam.d} pathLength="1" class="beam-glow" />
+          <path d={beam.d} pathLength="1" class="beam-core" />
+          <path d={beam.d} pathLength="1" class="beam-light" />
+        </g>
       ))}
     </g>
 
     <!-- users -->
     <g class="part node-users" style="--d: 0.2s">
+      {hits.filter((hit) => hit.node === "users").map((hit) => (
+        <circle cx="260" cy="30" r="22" class="hit hit-response" style={`--at: ${hit.at}`} />
+      ))}
       <circle cx="260" cy="30" r="17" fill="#ffffff" stroke="#c9d7e8" />
       <path d="M249 30 h22 M260 19 c-6 6 -6 16 0 22 M260 19 c6 6 6 16 0 22 M251 24 h18 M251 36 h18" fill="none" stroke="#5b6cff" stroke-width="1.4" stroke-linecap="round" />
-      <text x="286" y="34" class="t-small">users</text>
+      <text x="292" y="34" class="t-small">users</text>
     </g>
 
     <!-- boxes -->
@@ -101,6 +142,9 @@ const pulses = [
           <polygon class="face-left" points={f.left} />
           <polygon class="face-right" points={f.right} />
           <polygon class="face-top" points={f.top} />
+          {hits.filter((hit) => hit.node === box.id).map((hit) => (
+            <polygon class="hit" points={f.top} style={`--at: ${hit.at}`} />
+          ))}
           {box.id === "lb" ? (
             <g class="glyph" transform={`translate(${box.cx - 16} ${box.cy - 4})`}>
               <rect width="32" height="8" rx="4" fill="#ffffff" opacity="0.9" />
@@ -124,6 +168,9 @@ const pulses = [
       <path class="face-left" d="M222 336 v34 a38 14 0 0 0 76 0 v-34" />
       <ellipse class="face-top" cx="260" cy="336" rx="38" ry="14" />
       <ellipse cx="260" cy="336" rx="22" ry="7" fill="none" stroke="#9cc9ad" />
+      {hits.filter((hit) => hit.node === "db").map((hit) => (
+        <ellipse cx="260" cy="336" rx="38" ry="14" class="hit hit-long" style={`--at: ${hit.at}`} />
+      ))}
     </g>
 
     <!-- labels -->
@@ -134,15 +181,23 @@ const pulses = [
       </g>
     ))}
 
-    <!-- request pulses -->
-    {pulses.map((pulse) => (
-      <circle r="7" fill="url(#g-pulse)" opacity="0" class="pulse">
-        <set attributeName="opacity" to="1" begin={`${pulse.begin}s`} />
-        <animateMotion dur={`${pulse.dur}s`} begin={`${pulse.begin}s`} repeatCount="indefinite" calcMode="spline" keyTimes="0;1" keySplines="0.45 0 0.35 1">
-          <mpath href={`#${pulse.path}`} />
-        </animateMotion>
-      </circle>
-    ))}
+    <!-- request / response tags beside the users link -->
+    {routes.map((route) => {
+      const w = tagWidth(route.request);
+      const r = tagWidth(route.response);
+      return (
+        <>
+          <g class="tag tag-request" style={`--at: ${route.offset}`}>
+            <rect x={248 - w} y="62" width={w} height="22" rx="11" />
+            <text x={248 - w / 2} y="77" text-anchor="middle">{route.request}</text>
+          </g>
+          <g class="tag tag-response" style={`--at: ${route.offset + 0.63}`}>
+            <rect x="272" y="62" width={r} height="22" rx="11" />
+            <text x={272 + r / 2} y="77" text-anchor="middle">{route.response}</text>
+          </g>
+        </>
+      );
+    })}
   </svg>
 
   <!-- floating cards -->
@@ -157,31 +212,22 @@ const pulses = [
   <div class="chip chip-monitor">
     <span><strong>Monitoring</strong><small>Prometheus · Grafana</small></span>
     <svg class="spark" viewBox="0 0 90 30" aria-hidden="true">
-      <path class="spark-area" d="M0 24 L12 20 L24 22 L36 14 L48 16 L60 9 L72 12 L90 6 L90 30 L0 30Z" />
-      <path class="spark-line" pathLength="1" d="M0 24 L12 20 L24 22 L36 14 L48 16 L60 9 L72 12 L90 6" />
+      <g class="spark-scroll">
+        <path class="spark-area" d="M0 22 L10 18 L20 20 L30 13 L40 16 L50 10 L60 14 L70 9 L80 15 L90 22 L100 18 L110 20 L120 13 L130 16 L140 10 L150 14 L160 9 L170 15 L180 22 L180 30 L0 30Z" />
+        <path class="spark-line" d="M0 22 L10 18 L20 20 L30 13 L40 16 L50 10 L60 14 L70 9 L80 15 L90 22 L100 18 L110 20 L120 13 L130 16 L140 10 L150 14 L160 9 L170 15 L180 22" />
+      </g>
+      <circle class="spark-dot" cx="88" cy="21" r="2.5" />
     </svg>
   </div>
 </div>
 
 <script>
-  // Request pulses (SMIL) start with the opening sequence, pause off-screen,
-  // and stay still with reduced motion.
+  // The data flow is pure CSS; pause it while the map is off-screen.
   const map = document.querySelector<HTMLElement>("[data-infra]");
-  const svg = map?.querySelector("svg");
-  if (map && svg) {
-    svg.pauseAnimations();
-    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      let started = false;
-      new IntersectionObserver(([entry]) => {
-        if (entry.isIntersecting) {
-          if (!started) svg.setCurrentTime(0);
-          started = true;
-          svg.unpauseAnimations();
-        } else {
-          svg.pauseAnimations();
-        }
-      }, { threshold: 0.4, rootMargin: "0px 0px -8% 0px" }).observe(map);
-    }
+  if (map) {
+    new IntersectionObserver(([entry]) => {
+      map.classList.toggle("is-offscreen", !entry.isIntersecting);
+    }).observe(map);
   }
 </script>
 
@@ -221,13 +267,70 @@ const pulses = [
     transform: translateY(-4px);
   }
 
+  .infra {
+    --cycle: 6s;
+    --start: 2.6s;
+  }
+
   .link {
     fill: none;
-    stroke: url(#g-link);
-    stroke-width: 2;
+    stroke: #dfe4f2;
+    stroke-width: 3;
     stroke-linecap: round;
-    stroke-dasharray: 3 5;
-    opacity: 0.85;
+  }
+
+  /* A light streak: one short dash that runs the length of the path. */
+  .beam path {
+    fill: none;
+    stroke-linecap: round;
+    stroke-dasharray: 0.38 2;
+    stroke-dashoffset: 0.38;
+  }
+
+  .beam-glow {
+    stroke-width: 10;
+    opacity: 0.3;
+  }
+
+  .beam-core {
+    stroke-width: 3.5;
+  }
+
+  .beam .beam-light {
+    stroke: #fff;
+    stroke-width: 1.2;
+  }
+
+  .beam-request :is(.beam-glow, .beam-core) { stroke: #5b4fe0; }
+  .beam-response :is(.beam-glow, .beam-core) { stroke: #10a37f; }
+
+  .hit {
+    fill: rgba(124, 108, 255, 0.18);
+    stroke: #7c6cff;
+    stroke-width: 2;
+    opacity: 0;
+  }
+
+  ellipse.hit, .hit-response {
+    fill: rgba(22, 163, 127, 0.14);
+    stroke: #16a37f;
+  }
+
+  .tag rect {
+    fill: #fff;
+    stroke: #d6dcf5;
+  }
+
+  .tag text {
+    font: 600 10.5px var(--mono);
+  }
+
+  .tag-request text { fill: #5b4fe0; }
+  .tag-response text { fill: #12805f; }
+  .tag-response rect { stroke: #bfe5d6; }
+
+  .tag {
+    opacity: 0;
   }
 
   .t-title {
@@ -271,7 +374,7 @@ const pulses = [
   }
 
   .chip-deploy {
-    top: 4%;
+    top: -4%;
     left: -4%;
   }
 
@@ -311,6 +414,7 @@ const pulses = [
   .spark {
     width: 90px;
     height: 30px;
+    overflow: hidden;
   }
 
   .spark-area { fill: rgba(124, 108, 255, 0.1); }
@@ -320,10 +424,15 @@ const pulses = [
     stroke: #7c6cff;
     stroke-width: 2;
     stroke-linejoin: round;
-    stroke-dasharray: 1;
   }
 
-  /* Opening sequence: parts drop in, links draw, cards pop, then pulses begin (SMIL). */
+  .spark-dot {
+    fill: #7c6cff;
+    stroke: #fff;
+    stroke-width: 1.5;
+  }
+
+  /* Opening sequence: parts drop in, tracks appear, cards pop; the data flow starts after. */
   :global(.js-anim) .infra .part,
   :global(.js-anim) .infra .chip {
     opacity: 0;
@@ -334,23 +443,71 @@ const pulses = [
     opacity: 0;
   }
 
-  :global(.js-anim) .infra:not(:global(.is-playing)) .pulse {
-    visibility: hidden;
-  }
-
-  :global(.js-anim) .infra .spark-line {
-    stroke-dashoffset: 1;
-  }
-
   .infra:global(.is-playing) .part {
     animation: part-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--d, 0s) + 0.5s) both;
     transform-box: fill-box;
   }
 
   .infra:global(.is-playing) .link {
-    animation:
-      link-in 0.6s ease calc(var(--d, 0s) + 0.5s) both,
-      link-flow 1.4s linear calc(var(--d, 0s) + 1.1s) infinite;
+    animation: link-in 0.6s ease calc(var(--d, 0s) + 0.5s) both;
+  }
+
+  /* Data flow: every streak, glow and tag shares one cycle and starts at its own moment. */
+  .infra:global(.is-playing) .beam path {
+    animation: beam var(--cycle) linear calc(var(--start) + var(--cycle) * var(--at)) infinite backwards;
+  }
+
+  .infra:global(.is-playing) .hit {
+    animation: hit var(--cycle) ease-out calc(var(--start) + var(--cycle) * var(--at)) infinite backwards;
+  }
+
+  .infra:global(.is-playing) .hit-long {
+    animation-name: hit-long;
+  }
+
+  .infra:global(.is-playing) .tag {
+    animation: tag var(--cycle) ease calc(var(--start) + var(--cycle) * var(--at)) infinite backwards;
+  }
+
+  .infra:global(.is-playing) .spark-scroll {
+    animation: spark-scroll 6s linear 3s infinite;
+  }
+
+  .infra:global(.is-offscreen) * {
+    animation-play-state: paused !important;
+  }
+
+  @keyframes beam {
+    0% { stroke-dashoffset: 0.38; animation-timing-function: cubic-bezier(0.45, 0, 0.4, 1); }
+    10% { stroke-dashoffset: -1; }
+    100% { stroke-dashoffset: -1; }
+  }
+
+  @keyframes hit {
+    0% { opacity: 0; }
+    2% { opacity: 1; }
+    12% { opacity: 0; }
+    100% { opacity: 0; }
+  }
+
+  @keyframes hit-long {
+    0% { opacity: 0; }
+    2% { opacity: 1; }
+    9% { opacity: 1; }
+    14% { opacity: 0; }
+    100% { opacity: 0; }
+  }
+
+  @keyframes tag {
+    0% { opacity: 0; transform: translateY(4px); }
+    3% { opacity: 1; transform: none; }
+    13% { opacity: 1; transform: none; }
+    17% { opacity: 0; transform: translateY(-3px); }
+    100% { opacity: 0; }
+  }
+
+  @keyframes spark-scroll {
+    to { transform: translateX(-90px); }
   }
 
   .infra:global(.is-playing) .chip-deploy {
@@ -359,10 +516,6 @@ const pulses = [
 
   .infra:global(.is-playing) .chip-monitor {
     animation: chip-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) 2.7s both;
-  }
-
-  .infra:global(.is-playing) .spark-line {
-    animation: spark 1.2s ease 3s both;
   }
 
   @keyframes part-in {
@@ -375,18 +528,9 @@ const pulses = [
     to { opacity: 0.85; }
   }
 
-  @keyframes link-flow {
-    to { stroke-dashoffset: -16; }
-  }
-
   @keyframes chip-in {
     from { opacity: 0; transform: translateY(12px) scale(0.95); }
     to { opacity: 1; transform: none; }
-  }
-
-  @keyframes spark {
-    from { stroke-dashoffset: 1; }
-    to { stroke-dashoffset: 0; }
   }
 
   /* Small screens: the cards sit under the map instead of over it. */

@@ -1,0 +1,26 @@
+---
+import ProjectVisual from "./ProjectVisual.astro";
+
+interface Props {
+  src?: string;
+  alt: string;
+  kind: "image" | "video";
+  ratio: string;
+  poster?: string;
+  visual?: "ai" | "platform" | "iot" | "identity" | "research" | "agri" | "web";
+}
+
+const { src, alt, kind, ratio, poster, visual = "ai" } = Astro.props;
+---
+
+<div class="media-frame" style={`aspect-ratio: ${ratio}`} data-media>
+  {src ? (
+    kind === "video" ? (
+      <video src={src} poster={poster} muted loop playsinline preload="none" aria-label={alt}></video>
+    ) : (
+      <img src={src} alt={alt} loading="lazy" decoding="async" />
+    )
+  ) : (
+    <ProjectVisual kind={visual} />
+  )}
+</div>

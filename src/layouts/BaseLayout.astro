@@ -8,8 +8,8 @@ interface Props {
 }
 
 const {
-  title = "Chanuth Abeynayake | Computer Engineering",
-  description = "Computer Engineering undergraduate working across software engineering, AI systems and infrastructure."
+  title = "Chanuth Abeynayake — Freelance DevOps & AI automation engineer",
+  description = "Freelance DevOps and AI automation engineer building reliable cloud infrastructure, automation and fast business websites."
 } = Astro.props;
 ---
 
@@ -20,12 +20,27 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#fafaf8" />
+    <meta name="theme-color" content="#FBFDFF" />
     <meta name="color-scheme" content="light" />
 
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:image" content={`${import.meta.env.BASE_URL}og-preview.svg`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={`${import.meta.env.BASE_URL}og-preview.svg`} />
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Person",
+      name: "Chanuth Abeynayake",
+      email: "chanuth412@gmail.com",
+      address: { "@type": "PostalAddress", addressCountry: "Sri Lanka" },
+      url: "https://github.com/Chanuth412-pixel",
+      sameAs: ["https://github.com/Chanuth412-pixel"],
+      knowsAbout: ["DevOps", "AI automation", "Cloud infrastructure"]
+    })} />
 
     <title>{title}</title>
   </head>

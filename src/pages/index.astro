@@ -234,7 +234,17 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
                   <div><dt>Built</dt><dd>{project.built}</dd></div>
                   <div><dt>Result</dt><dd>{project.result}</dd></div>
                 </dl>
-                <div class="tag-list">{project.stack.map((tag) => <span>{tag}</span>)}</div>
+                <ul class="tag-list" aria-label={`Tools used for ${project.title}`}>
+                  {project.stack.map((name) => {
+                    const tool = toolByName.get(name);
+                    return (
+                      <li style={tool ? `--brand: ${tool.color}` : undefined}>
+                        {tool && <svg viewBox="0 0 24 24" aria-hidden="true"><path d={tool.path} /></svg>}
+                        {name}
+                      </li>
+                    );
+                  })}
+                </ul>
                 {project.href && <a class="inline-link" href={project.href} target="_blank" rel="noreferrer">Visit live site <span aria-hidden="true">↗</span></a>}
               </div>
             </article>

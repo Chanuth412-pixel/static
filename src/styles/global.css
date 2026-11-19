@@ -16,7 +16,6 @@
   --radius: 14px;
   --shadow: 0 18px 40px -28px rgba(31, 48, 71, 0.45);
   --font: "Inter Variable", Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
 
   color-scheme: light;
   font-family: var(--font);
@@ -242,9 +241,7 @@ a {
 .card-label {
   margin: 0;
   color: var(--muted);
-  font: 600 12px/1.3 var(--mono);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font: 600 14px/1.3 var(--font);
 }
 
 .eyebrow {
@@ -611,7 +608,7 @@ a {
   display: block;
   margin-bottom: 2px;
   color: var(--muted);
-  font: 500 12px var(--mono);
+  font: 500 12.5px var(--font);
 }
 
 .service-link {
@@ -719,7 +716,7 @@ a {
   border: 1px solid var(--line);
   border-radius: 7px;
   color: #5b6b80;
-  font: 12px var(--mono);
+  font: 500 12.5px var(--font);
 }
 
 .browser-url svg {
@@ -798,10 +795,8 @@ a.media-frame--browser:focus-visible {
 }
 
 .case-copy dt {
-  color: var(--muted);
-  font: 600 11.5px var(--mono);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  color: var(--ink);
+  font: 600 14px var(--font);
 }
 
 .case-copy dl div:last-child dt {
@@ -817,16 +812,27 @@ a.media-frame--browser:focus-visible {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 24px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
 }
 
-.tag-list span {
-  padding: 5px 10px;
-  background: var(--soft);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: #45607b;
-  font: 500 12px var(--mono);
+.tag-list li {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 11px;
+  background: #fff;
+  border: 1px solid #e6ebf3;
+  border-radius: 8px;
+  color: #3d4d63;
+  font: 500 13px var(--font);
+}
+
+.tag-list svg {
+  width: 15px;
+  height: 15px;
+  fill: var(--brand, #8494a8);
 }
 
 .inline-link {
@@ -912,11 +918,12 @@ a.media-frame--browser:focus-visible {
 
 .pr-repo {
   color: var(--muted);
-  font: 500 13px var(--mono);
+  font: 500 14px var(--font);
 }
 
 .pr-row strong {
-  font: 600 15px var(--mono);
+  font: 600 15px var(--font);
+  font-variant-numeric: tabular-nums;
 }
 
 .pr-row p {
@@ -932,7 +939,7 @@ a.media-frame--browser:focus-visible {
   background: var(--sage-soft);
   border-radius: 999px;
   color: var(--sage);
-  font: 600 12px var(--mono);
+  font: 600 12.5px var(--font);
   font-style: normal;
 }
 
@@ -986,7 +993,8 @@ a.media-frame--browser:focus-visible {
   border: 2px solid var(--accent);
   border-radius: 50%;
   color: var(--accent);
-  font: 600 13px var(--mono);
+  font: 600 13px var(--font);
+  font-variant-numeric: tabular-nums;
 }
 
 .timeline li:last-child .timeline-dot {

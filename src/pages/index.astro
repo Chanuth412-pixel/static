@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import MediaFrame from "../components/MediaFrame.astro";
-import InfraMap from "../components/InfraMap.astro";
+import ServiceCanvas from "../components/ServiceCanvas.astro";
 import toolIcons from "../data/tools.json";
 import HeroRibbon from "../components/HeroRibbon.astro";
 
@@ -96,7 +96,7 @@ const headline = [
 
 // Brand marks from simple-icons (CC0). AWS is not in that set, so it gets a plain cloud glyph.
 const cloudPath = "M6.5 19a5 5 0 0 1-.9-9.92A6.5 6.5 0 0 1 18.3 8.6 5.25 5.25 0 0 1 17.75 19Z";
-const tools = toolIcons.map((tool) => ({ ...tool, path: tool.path ?? cloudPath }));
+const tools = toolIcons.filter((tool) => tool.name !== "PostgreSQL").map((tool) => ({ ...tool, path: tool.path ?? cloudPath }));
 const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
 ---
 
@@ -159,7 +159,7 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
             <li><strong>Prometheus &amp; Grafana</strong> so problems show up early</li>
           </ul>
         </div>
-        <InfraMap />
+        <ServiceCanvas />
       </section>
 
       <section class="section reveal" id="services">

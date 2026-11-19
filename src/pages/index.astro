@@ -3,6 +3,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import MediaFrame from "../components/MediaFrame.astro";
 import ServiceCanvas from "../components/ServiceCanvas.astro";
 import toolIcons from "../data/tools.json";
+import linkIcons from "../data/link-icons.json";
 import HeroRibbon from "../components/HeroRibbon.astro";
 
 const base = import.meta.env.BASE_URL;
@@ -16,6 +17,10 @@ const featuredWork = [
     result: "A connected workflow from infrastructure request through validated AWS deployment.",
     visual: "ai",
     stack: ["Python", "LangGraph", "Ollama", "RAG", "AWS", "Terraform"],
+    links: [
+      { kind: "blog", label: "System overview", href: "https://dev.to/chanuth_412/agentic-pipeline-to-convert-aws-infrastructure-to-terraform-29k4" },
+      { kind: "code", label: "Code", href: "https://github.com/Chanuth412-pixel/tf-agent/tree/main/tf%20agent" },
+    ],
   },
   {
     title: "Racoona",
@@ -29,6 +34,10 @@ const featuredWork = [
     imageAlt: "Racoona AI homepage: “We Invest in Great Hospitality Businesses”",
     stack: ["Astro", "Web3Forms", "Email delivery"],
     href: "https://racoona.ai/",
+    links: [
+      { kind: "site", label: "Live site", href: "https://racoona.ai/" },
+      { kind: "code", label: "Code", href: "https://github.com/Chanuth412-pixel/racoona/tree/main/racoona-web" },
+    ],
   },
   {
     title: "Peracom Internal Developer Platform",
@@ -38,14 +47,53 @@ const featuredWork = [
     result: "A repeatable internal platform workflow with monitoring in place.",
     visual: "platform",
     stack: ["Proxmox", "Terraform", "Ansible", "Kubernetes", "Prometheus", "Grafana"],
+    links: [
+      { kind: "code", label: "Code", href: "https://github.com/IsharaEkanayaka/kubesmith" },
+    ],
   },
 ];
 
 const moreWork = [
-  { title: "GloveXcel", description: "IoT rehabilitation glove with sensor processing, BLE communication and web APIs.", tags: ["ESP32", "BLE", "React", "Node.js"], href: "https://github.com/cepdnaclk/e21-3yp-GloveXcel" },
-  { title: "FreeIPA migration", description: "Moved legacy OpenLDAP to centralized FreeIPA on AlmaLinux 9 with Podman and Keycloak SSO.", tags: ["FreeIPA", "Keycloak", "Podman"], visual: "identity" },
-  { title: "Agrimate", description: "Bilingual farmer-to-customer marketplace with crop-care advice and delivery routing.", tags: ["Flutter", "Node.js", "Firebase"], visual: "agri" },
+  {
+    title: "GloveXcel",
+    description: "IoT rehabilitation glove with sensor processing, BLE communication and web APIs.",
+    tags: ["ESP32", "BLE", "React", "Node.js"],
+    links: [{ kind: "code", label: "Code", href: "https://github.com/cepdnaclk/e21-3yp-GloveXcel" }],
+  },
+  {
+    title: "FreeIPA migration",
+    description: "Moved legacy OpenLDAP to centralized FreeIPA on AlmaLinux 9 with Podman and Keycloak SSO.",
+    tags: ["FreeIPA", "Keycloak", "Podman"],
+    links: [
+      { kind: "blog", label: "Overview", href: "https://dev.to/chanuth_412/running-freeipa-on-ubuntu-using-podman-mdo" },
+      { kind: "blog", label: "Step-by-step guide", href: "https://dev.to/chanuth_412/running-freeipa-on-ubuntu-using-podman-part-2-step-by-step-deployment-3ngc" },
+    ],
+  },
+  {
+    title: "Agrimate",
+    description: "Bilingual farmer-to-customer marketplace with crop-care advice and delivery routing.",
+    tags: ["Flutter", "Node.js", "Firebase"],
+    links: [
+      { kind: "blog", label: "Blog post", href: "https://realworldsolutions-chan.blogspot.com/2025/10/making-marketplace-for-farmers-and.html" },
+      { kind: "code", label: "Code", href: "https://github.com/Chanuth412-pixel/agrimate" },
+    ],
+  },
 ];
+
+// Profiles linked from the contact panel and footer.
+const profiles = [
+  { label: "GitHub", href: "https://github.com/Chanuth412-pixel" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/chanuth-abeynayake-459a95235" },
+  { label: "Upwork", href: "https://www.upwork.com/freelancers/~019b9c84e4a834fb9e" },
+];
+
+// Icon for each link: GitHub for code, the blog's own mark for posts, an arrow for live sites.
+const linkIcon = (href: string, kind: string) => {
+  if (kind === "code") return linkIcons.github;
+  if (href.includes("dev.to")) return linkIcons.devdotto;
+  if (href.includes("blogspot")) return linkIcons.blogger;
+  return null;
+};
 
 const pullRequests = [
   ["pypa/build", "1281", "Fixed the getting-started tutorial command.", "https://github.com/pypa/build/pull/1281"],
@@ -245,7 +293,20 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
                     );
                   })}
                 </ul>
-                {project.href && <a class="inline-link" href={project.href} target="_blank" rel="noreferrer">Visit live site <span aria-hidden="true">↗</span></a>}
+                {project.links && (
+                  <div class="project-links">
+                    {project.links.map((link) => {
+                      const icon = linkIcon(link.href, link.kind);
+                      return (
+                        <a class:list={["project-link", `project-link--${link.kind}`]} href={link.href} target="_blank" rel="noreferrer">
+                          {icon && <svg viewBox="0 0 24 24" aria-hidden="true"><path d={icon} /></svg>}
+                          {link.label}
+                          <span aria-hidden="true">↗</span>
+                        </a>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </article>
           ))}
@@ -256,8 +317,19 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
             {moreWork.map((project) => (
               <article>
                 <div><h4>{project.title}</h4><p>{project.description}</p></div>
-                <div class="tag-list">{project.tags.map((tag) => <span>{tag}</span>)}</div>
-                {project.href ? <a class="inline-link" href={project.href} target="_blank" rel="noreferrer">Repository <span aria-hidden="true">↗</span></a> : <span></span>}
+                <ul class="tag-list">{project.tags.map((tag) => <li>{tag}</li>)}</ul>
+                <div class="project-links">
+                  {project.links.map((link) => {
+                    const icon = linkIcon(link.href, link.kind);
+                    return (
+                      <a class:list={["project-link", `project-link--${link.kind}`]} href={link.href} target="_blank" rel="noreferrer">
+                        {icon && <svg viewBox="0 0 24 24" aria-hidden="true"><path d={icon} /></svg>}
+                        {link.label}
+                        <span aria-hidden="true">↗</span>
+                      </a>
+                    );
+                  })}
+                </div>
               </article>
             ))}
           </div>
@@ -309,7 +381,10 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
           <h2>Have a system to improve?</h2>
           <p>Tell me what you need, and I’ll reply with the next sensible step.</p>
           <a class="contact-email" href="mailto:chanuth412@gmail.com">chanuth412@gmail.com <span aria-hidden="true">↗</span></a>
-          <div class="social-links"><a href="https://github.com/Chanuth412-pixel" target="_blank" rel="noreferrer">GitHub ↗</a><a href={`${base}cv.pdf`} download>CV ↓</a></div>
+          <div class="social-links">
+            {profiles.map((profile) => <a href={profile.href} target="_blank" rel="noreferrer">{profile.label} ↗</a>)}
+            <a href={`${base}cv.pdf`} download>CV ↓</a>
+          </div>
         </div>
         <form class="contact-form" data-contact-form>
           <div class="form-row">
@@ -330,7 +405,7 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
     <footer class="site-footer">
       <a class="brand" href={`${base}#top`}>CA<span>.</span></a>
       <a href="mailto:chanuth412@gmail.com">chanuth412@gmail.com</a>
-      <a href="https://github.com/Chanuth412-pixel" target="_blank" rel="noreferrer">GitHub</a>
+      {profiles.map((profile) => <a href={profile.href} target="_blank" rel="noreferrer">{profile.label}</a>)}
       <a href={`${base}cv.pdf`} download>CV</a>
       <small>© {new Date().getFullYear()} Chanuth Abeynayake</small>
     </footer>

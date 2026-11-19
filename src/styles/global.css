@@ -852,6 +852,75 @@ a.media-frame--browser:focus-visible {
   transform: translate(2px, -2px);
 }
 
+/* Project links: live site, code and blog posts */
+.project-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.project-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.project-link svg {
+  width: 15px;
+  height: 15px;
+  fill: currentColor;
+}
+
+.project-link span {
+  color: var(--muted);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.project-link:hover {
+  border-color: #c7d3e3;
+  background: #f8fafd;
+  transform: translateY(-1px);
+}
+
+.project-link:hover span {
+  color: var(--accent);
+  transform: translate(2px, -2px);
+}
+
+.project-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.project-link--site {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+
+.project-link--site span {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.project-link--site:hover {
+  background: #2a4061;
+  border-color: #2a4061;
+}
+
+.project-link--site:hover span {
+  color: #fff;
+}
+
 /* ---------- More projects ---------- */
 .more-work {
   margin-top: 100px;
@@ -865,7 +934,7 @@ a.media-frame--browser:focus-visible {
 
 .more-work article {
   display: grid;
-  grid-template-columns: 1.3fr 1fr 110px;
+  grid-template-columns: 1.2fr 1fr auto;
   align-items: center;
   gap: 24px;
   padding: 22px 0;
@@ -884,12 +953,17 @@ a.media-frame--browser:focus-visible {
 }
 
 .more-work .tag-list,
-.more-work .inline-link {
+.more-work .project-links {
   margin: 0;
 }
 
-.more-work .inline-link {
-  justify-self: end;
+.more-work .project-links {
+  justify-content: flex-end;
+}
+
+.more-work .project-link {
+  padding: 6px 10px;
+  font-size: 13px;
 }
 
 /* ---------- Open source ---------- */
@@ -1502,6 +1576,10 @@ a.media-frame--browser:focus-visible {
   .more-work article {
     grid-template-columns: 1fr;
     gap: 12px;
+  }
+
+  .more-work .project-links {
+    justify-content: flex-start;
   }
 
   .more-work .inline-link {

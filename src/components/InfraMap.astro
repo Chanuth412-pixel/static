@@ -1,0 +1,409 @@
+---
+// Hero illustration: a small cloud setup drawn in isometric view.
+// On load the parts drop in one by one, the connections draw, then requests flow
+// through as pulses. Pulses pause when off-screen; reduced motion shows a still frame.
+
+type Box = { id: string; cx: number; cy: number; a: number; h: number; tone: "base" | "accent" | "green" };
+
+// Top-face rhombus + two side faces for an isometric box centred at (cx, cy).
+const faces = ({ cx, cy, a, h }: Box) => {
+  const b = Math.round(a * 0.577);
+  const top = `${cx},${cy - b} ${cx + a},${cy} ${cx},${cy + b} ${cx - a},${cy}`;
+  const left = `${cx - a},${cy} ${cx},${cy + b} ${cx},${cy + b + h} ${cx - a},${cy + h}`;
+  const right = `${cx},${cy + b} ${cx + a},${cy} ${cx + a},${cy + h} ${cx},${cy + b + h}`;
+  return { top, left, right, b };
+};
+
+const boxes: Box[] = [
+  { id: "lb", cx: 260, cy: 128, a: 62, h: 16, tone: "accent" },
+  { id: "podA", cx: 168, cy: 226, a: 54, h: 30, tone: "base" },
+  { id: "podB", cx: 352, cy: 226, a: 54, h: 30, tone: "base" },
+];
+
+const labels = [
+  { x: 335, y: 112, title: "Load balancer", sub: "HTTPS · TLS", delay: 0.55 },
+  { x: 40, y: 292, title: "api · pod", sub: "Kubernetes", delay: 0.75 },
+  { x: 384, y: 292, title: "api · pod", sub: "Kubernetes", delay: 0.85 },
+  { x: 112, y: 366, title: "PostgreSQL", sub: "managed database", delay: 1.0 },
+];
+
+// Connections, drawn after the parts land; pulses travel along them.
+const links = [
+  { id: "l-users", d: "M260 46 L260 92" },
+  { id: "l-a", d: "M236 150 C214 170 196 176 184 194" },
+  { id: "l-b", d: "M284 150 C306 170 324 176 336 194" },
+  { id: "l-da", d: "M184 270 C206 300 230 306 248 320" },
+  { id: "l-db", d: "M336 270 C314 300 290 306 272 320" },
+];
+
+const pulses = [
+  { path: "l-users", dur: 2.2, begin: 3.0 },
+  { path: "l-a", dur: 2.2, begin: 3.5 },
+  { path: "l-b", dur: 2.2, begin: 4.2 },
+  { path: "l-da", dur: 2.2, begin: 4.0 },
+  { path: "l-db", dur: 2.2, begin: 4.7 },
+];
+---
+
+<div class="infra" data-play data-infra>
+  <svg viewBox="0 0 520 460" role="img" aria-labelledby="infra-title infra-desc">
+    <title id="infra-title">Example cloud setup</title>
+    <desc id="infra-desc">Users reach a load balancer, which routes requests to two Kubernetes pods backed by a PostgreSQL database, with monitoring.</desc>
+
+    <defs>
+      <linearGradient id="g-link" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#7c6cff" />
+        <stop offset="1" stop-color="#3fa9c9" />
+      </linearGradient>
+      <radialGradient id="g-pulse">
+        <stop offset="0" stop-color="#ffffff" />
+        <stop offset="0.35" stop-color="#8f7bff" />
+        <stop offset="1" stop-color="#8f7bff" stop-opacity="0" />
+      </radialGradient>
+      <linearGradient id="g-floor" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#ffffff" stop-opacity="0.9" />
+        <stop offset="1" stop-color="#eef3fb" stop-opacity="0.75" />
+      </linearGradient>
+      <pattern id="g-grid" width="24" height="14" patternUnits="userSpaceOnUse" patternTransform="skewX(-60)">
+        <path d="M24 0 L0 0 0 14" fill="none" stroke="#c9d7e8" stroke-width="0.6" />
+      </pattern>
+      <clipPath id="c-floor">
+        <polygon points="260,96 486,226 260,356 34,226" />
+      </clipPath>
+      {links.map((link) => <path id={link.id} d={link.d} />)}
+    </defs>
+
+    <!-- floor -->
+    <g class="part floor" style="--d: 0s">
+      <polygon points="260,96 486,226 260,356 34,226" fill="url(#g-floor)" stroke="#d6e1ee" />
+      <rect x="0" y="80" width="520" height="300" fill="url(#g-grid)" clip-path="url(#c-floor)" opacity="0.7" />
+    </g>
+
+    <!-- connections -->
+    <g class="links">
+      {links.map((link, i) => (
+        <use href={`#${link.id}`} class="link" style={`--d: ${1.2 + i * 0.12}s`} />
+      ))}
+    </g>
+
+    <!-- users -->
+    <g class="part node-users" style="--d: 0.2s">
+      <circle cx="260" cy="30" r="17" fill="#ffffff" stroke="#c9d7e8" />
+      <path d="M249 30 h22 M260 19 c-6 6 -6 16 0 22 M260 19 c6 6 6 16 0 22 M251 24 h18 M251 36 h18" fill="none" stroke="#5b6cff" stroke-width="1.4" stroke-linecap="round" />
+      <text x="286" y="34" class="t-small">users</text>
+    </g>
+
+    <!-- boxes -->
+    {boxes.map((box, i) => {
+      const f = faces(box);
+      return (
+        <g class:list={["part", "box", `tone-${box.tone}`]} style={`--d: ${0.4 + i * 0.15}s`} data-node={box.id}>
+          <polygon class="face-left" points={f.left} />
+          <polygon class="face-right" points={f.right} />
+          <polygon class="face-top" points={f.top} />
+          {box.id === "lb" ? (
+            <g class="glyph" transform={`translate(${box.cx - 16} ${box.cy - 4})`}>
+              <rect width="32" height="8" rx="4" fill="#ffffff" opacity="0.9" />
+              <circle cx="6" cy="4" r="2" fill="#7c6cff" />
+              <circle cx="14" cy="4" r="2" fill="#5b98de" />
+              <circle cx="22" cy="4" r="2" fill="#3fb8a8" />
+            </g>
+          ) : (
+            <g class="glyph" transform={`translate(${box.cx - 9} ${box.cy - 9}) scale(0.75)`}>
+              <path fill="#326ce5" d="M12 1.5 21.6 6v12L12 22.5 2.4 18V6z" />
+              <circle cx="12" cy="12" r="4.2" fill="none" stroke="#fff" stroke-width="1.6" />
+              <path d="M12 5.2v2.6M12 16.2v2.6M5.6 9l2.3 1.3M16.1 13.7l2.3 1.3M5.6 15l2.3-1.3M16.1 10.3 18.4 9" stroke="#fff" stroke-width="1.4" stroke-linecap="round" />
+            </g>
+          )}
+        </g>
+      );
+    })}
+
+    <!-- database (cylinder) -->
+    <g class="part box tone-green" style="--d: 0.85s" data-node="db">
+      <path class="face-left" d="M222 336 v34 a38 14 0 0 0 76 0 v-34" />
+      <ellipse class="face-top" cx="260" cy="336" rx="38" ry="14" />
+      <ellipse cx="260" cy="336" rx="22" ry="7" fill="none" stroke="#9cc9ad" />
+    </g>
+
+    <!-- labels -->
+    {labels.map((label) => (
+      <g class="part label" style={`--d: ${label.delay}s`}>
+        <text x={label.x} y={label.y} class="t-title">{label.title}</text>
+        <text x={label.x} y={label.y + 15} class="t-small">{label.sub}</text>
+      </g>
+    ))}
+
+    <!-- request pulses -->
+    {pulses.map((pulse) => (
+      <circle r="7" fill="url(#g-pulse)" opacity="0" class="pulse">
+        <set attributeName="opacity" to="1" begin={`${pulse.begin}s`} />
+        <animateMotion dur={`${pulse.dur}s`} begin={`${pulse.begin}s`} repeatCount="indefinite" calcMode="spline" keyTimes="0;1" keySplines="0.45 0 0.35 1">
+          <mpath href={`#${pulse.path}`} />
+        </animateMotion>
+      </circle>
+    ))}
+  </svg>
+
+  <!-- floating cards -->
+  <div class="chip chip-deploy">
+    <span class="chip-icon">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4.5 10.5 8v7.5L4 12zM11.5 8 18 4.5V12l-6.5 3.5zM11 16.5l6.5-3.5v7.5L11 24z" fill="currentColor" transform="translate(0 -1.5)" /></svg>
+    </span>
+    <span><strong>terraform apply</strong><small>infrastructure as code</small></span>
+    <span class="chip-ok">✓</span>
+  </div>
+
+  <div class="chip chip-monitor">
+    <span><strong>Monitoring</strong><small>Prometheus · Grafana</small></span>
+    <svg class="spark" viewBox="0 0 90 30" aria-hidden="true">
+      <path class="spark-area" d="M0 24 L12 20 L24 22 L36 14 L48 16 L60 9 L72 12 L90 6 L90 30 L0 30Z" />
+      <path class="spark-line" pathLength="1" d="M0 24 L12 20 L24 22 L36 14 L48 16 L60 9 L72 12 L90 6" />
+    </svg>
+  </div>
+</div>
+
+<script>
+  // Request pulses (SMIL) start with the opening sequence, pause off-screen,
+  // and stay still with reduced motion.
+  const map = document.querySelector<HTMLElement>("[data-infra]");
+  const svg = map?.querySelector("svg");
+  if (map && svg) {
+    svg.pauseAnimations();
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      let started = false;
+      new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting) {
+          if (!started) svg.setCurrentTime(0);
+          started = true;
+          svg.unpauseAnimations();
+        } else {
+          svg.pauseAnimations();
+        }
+      }, { threshold: 0.4, rootMargin: "0px 0px -8% 0px" }).observe(map);
+    }
+  }
+</script>
+
+<style>
+  .infra {
+    position: relative;
+    max-width: 560px;
+    margin-inline: auto;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    font-family: var(--font);
+  }
+
+  .face-top { fill: #ffffff; stroke: #d3dfec; stroke-width: 1; }
+  .face-left { fill: #e4ecf6; stroke: #d3dfec; stroke-width: 1; }
+  .face-right { fill: #d2dfee; stroke: #c7d6e8; stroke-width: 1; }
+
+  .tone-accent .face-top { fill: #f3f1ff; stroke: #c9c2ff; }
+  .tone-accent .face-left { fill: #7c6cff; stroke: #7c6cff; }
+  .tone-accent .face-right { fill: #5b4fe0; stroke: #5b4fe0; }
+
+  .tone-green .face-top { fill: #f2faf5; stroke: #b9dcc6; }
+  .tone-green .face-left { fill: #cfe8d9; stroke: #b9dcc6; }
+
+  .box {
+    filter: drop-shadow(0 14px 14px rgba(31, 48, 71, 0.12));
+    transition: transform 0.3s ease;
+  }
+
+  .box:hover {
+    transform: translateY(-4px);
+  }
+
+  .link {
+    fill: none;
+    stroke: url(#g-link);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 3 5;
+    opacity: 0.85;
+  }
+
+  .t-title {
+    fill: var(--ink);
+    font-size: 13px;
+    font-weight: 650;
+  }
+
+  .t-small {
+    fill: #6b7f95;
+    font: 11px var(--mono);
+  }
+
+  /* floating cards */
+  .chip {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px 10px 10px;
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid rgba(201, 215, 232, 0.9);
+    border-radius: 12px;
+    box-shadow:
+      0 1px 1px rgba(31, 48, 71, 0.04),
+      0 18px 36px -18px rgba(50, 50, 93, 0.35),
+      0 10px 20px -12px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(10px);
+  }
+
+  .chip strong {
+    display: block;
+    color: var(--ink);
+    font-size: 13px;
+    line-height: 1.25;
+  }
+
+  .chip small {
+    color: #6b7f95;
+    font: 11px var(--mono);
+  }
+
+  .chip-deploy {
+    top: 4%;
+    left: -4%;
+  }
+
+  .chip-icon {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: #844fba;
+    color: #fff;
+  }
+
+  .chip-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .chip-ok {
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    margin-left: 4px;
+    border-radius: 50%;
+    background: #3f9a6b;
+    color: #fff;
+    font-size: 11px;
+  }
+
+  .chip-monitor {
+    right: -4%;
+    bottom: 10%;
+    padding-left: 14px;
+  }
+
+  .spark {
+    width: 90px;
+    height: 30px;
+  }
+
+  .spark-area { fill: rgba(124, 108, 255, 0.1); }
+
+  .spark-line {
+    fill: none;
+    stroke: #7c6cff;
+    stroke-width: 2;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+  }
+
+  /* Opening sequence: parts drop in, links draw, cards pop, then pulses begin (SMIL). */
+  :global(.js-anim) .infra .part,
+  :global(.js-anim) .infra .chip {
+    opacity: 0;
+  }
+
+  :global(.js-anim) .infra .link {
+    stroke-dashoffset: 60;
+    opacity: 0;
+  }
+
+  :global(.js-anim) .infra:not(:global(.is-playing)) .pulse {
+    visibility: hidden;
+  }
+
+  :global(.js-anim) .infra .spark-line {
+    stroke-dashoffset: 1;
+  }
+
+  .infra:global(.is-playing) .part {
+    animation: part-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--d, 0s) + 0.5s) both;
+    transform-box: fill-box;
+  }
+
+  .infra:global(.is-playing) .link {
+    animation:
+      link-in 0.6s ease calc(var(--d, 0s) + 0.5s) both,
+      link-flow 1.4s linear calc(var(--d, 0s) + 1.1s) infinite;
+  }
+
+  .infra:global(.is-playing) .chip-deploy {
+    animation: chip-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) 2.4s both;
+  }
+
+  .infra:global(.is-playing) .chip-monitor {
+    animation: chip-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) 2.7s both;
+  }
+
+  .infra:global(.is-playing) .spark-line {
+    animation: spark 1.2s ease 3s both;
+  }
+
+  @keyframes part-in {
+    from { opacity: 0; transform: translateY(-26px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  @keyframes link-in {
+    from { opacity: 0; }
+    to { opacity: 0.85; }
+  }
+
+  @keyframes link-flow {
+    to { stroke-dashoffset: -16; }
+  }
+
+  @keyframes chip-in {
+    from { opacity: 0; transform: translateY(12px) scale(0.95); }
+    to { opacity: 1; transform: none; }
+  }
+
+  @keyframes spark {
+    from { stroke-dashoffset: 1; }
+    to { stroke-dashoffset: 0; }
+  }
+
+  /* Small screens: the cards sit under the map instead of over it. */
+  @media (max-width: 680px) {
+    .infra {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    svg { flex: 0 0 100%; }
+
+    .chip {
+      position: static;
+      flex: 1 1 160px;
+    }
+
+    .chip-ok, .spark { display: none; }
+  }
+</style>

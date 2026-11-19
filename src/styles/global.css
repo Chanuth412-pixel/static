@@ -236,7 +236,6 @@ a {
   padding: 88px 0 80px;
 }
 
-.eyebrow,
 .card-label {
   margin: 0;
   color: var(--muted);
@@ -245,16 +244,22 @@ a {
   text-transform: uppercase;
 }
 
-.hero .eyebrow {
-  display: inline-flex;
+.eyebrow {
+  margin: 0;
+  color: var(--accent-strong);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+.hero-kicker {
+  display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 12px 6px 10px;
-  background: var(--sage-soft);
-  border: 1px solid #cfe2d6;
-  border-radius: 999px;
-  color: #355a42;
-  letter-spacing: 0.04em;
+  margin: 0;
+  color: var(--body);
+  font-size: 15px;
+  font-weight: 500;
 }
 
 .status-dot {
@@ -291,10 +296,8 @@ a {
 }
 
 .hero h1 .accent {
-  background: linear-gradient(100deg, #2f64a1 0%, #6c63ff 45%, #3fb8a8 75%, #2f64a1 100%) 0 0 / 220% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--accent-strong);
+  background: linear-gradient(90deg, #7c6cff, #3fa9c9) 0 92% / 100% 0.08em no-repeat;
 }
 
 .hero-description {
@@ -335,73 +338,16 @@ a {
   transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
-/* Small cards that appear once the agent run completes. */
-.float-badge {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px 10px 10px;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  box-shadow: 0 18px 36px -20px rgba(31, 48, 71, 0.5);
-  backdrop-filter: blur(8px);
-  transform: translateZ(40px);
-}
-
-.float-badge strong {
-  display: block;
-  color: var(--ink);
-  font-size: 13px;
-  line-height: 1.2;
-}
-
-.float-badge small {
-  color: var(--muted);
-  font: 11px var(--mono);
-}
-
-.badge-a {
-  top: -62px;
-  left: -36px;
-}
-
-.badge-b {
-  right: -24px;
-  bottom: -52px;
-}
-
-.badge-icon {
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #6c63ff, #5b98de);
-  color: #fff;
-  font-size: 14px;
-}
-
-.badge-dot {
-  width: 10px;
-  height: 10px;
-  margin: 0 4px;
-  border-radius: 50%;
-  background: #4f9a6e;
-  box-shadow: 0 0 0 4px rgba(79, 154, 110, 0.18);
-}
-
 /* ---------- Opening sequence ----------
    0.0s background fades in, beams cross the grid
-   0.2s badge, then the headline word by word (blur to sharp)
-   0.5s console card tilts up into place, then the agent run plays
-   ~5s  result badges pop in */
+   0.1s kicker, then the headline word by word (blur to sharp)
+   0.5s infrastructure map tilts up, parts drop in, links draw
+   ~3s  request pulses start flowing */
 .js-anim .hero-copy > :not(h1) {
   animation: rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.js-anim .hero-copy > .eyebrow { animation-delay: 0.1s; }
+.js-anim .hero-copy > .hero-kicker { animation-delay: 0.1s; }
 .js-anim .hero-copy > .hero-description { animation-delay: 0.95s; }
 .js-anim .hero-copy > .hero-actions { animation-delay: 1.1s; }
 .js-anim .hero-copy > .trust-line { animation-delay: 1.25s; }
@@ -413,23 +359,11 @@ a {
 .js-anim .hero h1 .accent {
   animation:
     word-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) calc(0.25s + var(--w) * 55ms) both,
-    shimmer 2.4s ease-in-out 1.4s both;
+    underline 0.8s cubic-bezier(0.65, 0, 0.35, 1) 1.3s both;
 }
 
 .js-anim .hero-visual {
   animation: card-in 1.3s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both;
-}
-
-.js-anim .float-badge {
-  opacity: 0;
-}
-
-.js-anim .console.is-playing ~ .float-badge {
-  animation: badge-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) 5s forwards;
-}
-
-.js-anim .console.is-playing ~ .badge-b {
-  animation-delay: 5.25s;
 }
 
 @keyframes word-in {
@@ -446,9 +380,8 @@ a {
   }
 }
 
-@keyframes shimmer {
-  from { background-position: 100% 0; }
-  to { background-position: 0 0; }
+@keyframes underline {
+  from { background-size: 0% 0.08em; }
 }
 
 @keyframes card-in {
@@ -463,17 +396,6 @@ a {
   }
 }
 
-@keyframes badge-in {
-  from {
-    opacity: 0;
-    transform: translateZ(40px) translateY(14px) scale(0.92);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateZ(40px);
-  }
-}
 
 /* ---------- Credibility ---------- */
 .credibility {
@@ -1181,15 +1103,37 @@ a {
   width: max-content;
 }
 
-.marquee-track span {
-  padding: 8px 16px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--body);
-  font-size: 14px;
-  font-weight: 500;
+.marquee-track {
+  gap: 40px !important;
+  padding: 6px 0;
+}
+
+.tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #7a8ca1;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   white-space: nowrap;
+  transition: color 0.25s ease;
+}
+
+.tool svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+  transition: fill 0.25s ease, transform 0.25s ease;
+}
+
+.tool:hover {
+  color: var(--ink);
+}
+
+.tool:hover svg {
+  fill: var(--brand);
+  transform: scale(1.12);
 }
 
 .js-anim .marquee-track {
@@ -1201,7 +1145,7 @@ a {
 }
 
 @keyframes marquee {
-  to { transform: translateX(calc(-50% - 6px)); }
+  to { transform: translateX(calc(-50% - 20px)); }
 }
 
 /* ---------- Cursor spotlight on cards ---------- */
@@ -1339,16 +1283,6 @@ a {
 
   .tools > p {
     margin-bottom: 14px;
-  }
-
-  .badge-a {
-    top: -22px;
-    left: 8px;
-  }
-
-  .badge-b {
-    right: 8px;
-    bottom: -24px;
   }
 
   .site-shell {

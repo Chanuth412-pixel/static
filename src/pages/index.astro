@@ -1,7 +1,8 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import MediaFrame from "../components/MediaFrame.astro";
-import HeroConsole from "../components/HeroConsole.astro";
+import InfraMap from "../components/InfraMap.astro";
+import toolIcons from "../data/tools.json";
 import HeroBackground from "../components/HeroBackground.astro";
 
 const base = import.meta.env.BASE_URL;
@@ -88,7 +89,9 @@ const headline = "I build cloud infrastructure and AI automation for startups an
   .split(" ")
   .map((word) => ({ word, accent: word === "AI" || word === "automation" }));
 
-const tools = ["Terraform", "AWS", "Kubernetes", "Ansible", "Proxmox", "Prometheus", "Grafana", "LangGraph", "Ollama", "Python", "Podman", "FreeIPA", "Keycloak", "Astro", "Node.js"];
+// Brand marks from simple-icons (CC0). AWS is not in that set, so it gets a plain cloud glyph.
+const cloudPath = "M6.5 19a5 5 0 0 1-.9-9.92A6.5 6.5 0 0 1 18.3 8.6 5.25 5.25 0 0 1 17.75 19Z";
+const tools = toolIcons.map((tool) => ({ ...tool, path: tool.path ?? cloudPath }));
 ---
 
 <BaseLayout
@@ -110,7 +113,7 @@ const tools = ["Terraform", "AWS", "Kubernetes", "Ansible", "Proxmox", "Promethe
       <section class="hero" id="top">
         <HeroBackground />
         <div class="hero-copy">
-          <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span>Available for new projects</p>
+          <p class="hero-kicker"><span class="status-dot" aria-hidden="true"></span>Freelance cloud &amp; AI engineer · taking new projects</p>
           <h1 aria-label="I build cloud infrastructure and AI automation for startups and small teams.">{headline.map((item, index) => <><span class:list={["w", item.accent && "accent"]} style={`--w: ${index}`} aria-hidden="true">{item.word}</span>{" "}</>)}</h1>
           <p class="hero-description">Reliable deployments, less manual work and practical systems that your team can understand and maintain.</p>
           <div class="hero-actions">
@@ -121,9 +124,7 @@ const tools = ["Terraform", "AWS", "Kubernetes", "Ansible", "Proxmox", "Promethe
         </div>
         <div class="hero-visual">
           <div class="tilt" data-tilt>
-            <HeroConsole />
-            <div class="float-badge badge-a"><span class="badge-icon">⬡</span><span><strong>Infrastructure as code</strong><small>Terraform · AWS</small></span></div>
-            <div class="float-badge badge-b"><span class="badge-dot"></span><span><strong>Monitored</strong><small>Prometheus · Grafana</small></span></div>
+            <InfraMap />
           </div>
         </div>
       </section>
@@ -138,14 +139,19 @@ const tools = ["Terraform", "AWS", "Kubernetes", "Ansible", "Proxmox", "Promethe
         <p>Tools I work with</p>
         <div class="marquee">
           <div class="marquee-track">
-            {[...tools, ...tools].map((tool, index) => <span aria-hidden={index >= tools.length ? "true" : undefined}>{tool}</span>)}
+            {[...tools, ...tools].map((tool, index) => (
+              <span class="tool" style={`--brand: ${tool.color}`} aria-hidden={index >= tools.length ? "true" : undefined}>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d={tool.path} /></svg>
+                {tool.name}
+              </span>
+            ))}
           </div>
         </div>
       </section>
 
       <section class="section reveal" id="services">
         <div class="section-heading">
-          <div><p class="eyebrow">01 / Services</p><h2>Technical work that moves the business forward.</h2></div>
+          <div><p class="eyebrow">Services</p><h2>Technical work that moves the business forward.</h2></div>
           <p>Choose a focused engagement or combine services around one outcome.</p>
         </div>
         <div class="service-grid" data-stagger>
@@ -174,7 +180,7 @@ const tools = ["Terraform", "AWS", "Kubernetes", "Ansible", "Proxmox", "Promethe
 
       <section class="section reveal" id="work">
         <div class="section-heading">
-          <div><p class="eyebrow">02 / Featured work</p><h2>Proof in the work.</h2></div>
+          <div><p class="eyebrow">Selected work</p><h2>Proof in the work.</h2></div>
           <p>Client delivery and platform engineering grounded in real systems.</p>
         </div>
         <div class="case-studies">
@@ -211,7 +217,7 @@ const tools = ["Terraform", "AWS", "Kubernetes", "Ansible", "Proxmox", "Promethe
 
       <section class="section band reveal" id="open-source">
         <div class="section-heading">
-          <div><p class="eyebrow">03 / Open source</p><h2>Comfortable in other people's codebases.</h2></div>
+          <div><p class="eyebrow">Open source</p><h2>Comfortable in other people's codebases.</h2></div>
           <p>Five merged fixes, reviewed and shipped to each project's own standards.</p>
         </div>
         <div class="pr-list" data-stagger>
@@ -229,7 +235,7 @@ const tools = ["Terraform", "AWS", "Kubernetes", "Ansible", "Proxmox", "Promethe
 
       <section class="section reveal" id="process">
         <div class="section-heading">
-          <div><p class="eyebrow">04 / Process</p><h2>A clear path from first conversation to handover.</h2></div>
+          <div><p class="eyebrow">How a project runs</p><h2>A clear path from first conversation to handover.</h2></div>
         </div>
         <ol class="timeline" data-stagger>
           {processSteps.map((step, index) => (
@@ -250,7 +256,7 @@ const tools = ["Terraform", "AWS", "Kubernetes", "Ansible", "Proxmox", "Promethe
 
       <section class="contact-panel reveal" id="contact">
         <div>
-          <p class="eyebrow">05 / Contact</p>
+          <p class="eyebrow">Contact</p>
           <h2>Have a system to improve?</h2>
           <p>Tell me what you need, and I’ll reply with the next sensible step.</p>
           <a class="contact-email" href="mailto:chanuth412@gmail.com">chanuth412@gmail.com <span aria-hidden="true">↗</span></a>

@@ -3,7 +3,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import MediaFrame from "../components/MediaFrame.astro";
 import InfraMap from "../components/InfraMap.astro";
 import toolIcons from "../data/tools.json";
-import HeroBackground from "../components/HeroBackground.astro";
+import HeroRibbon from "../components/HeroRibbon.astro";
 
 const base = import.meta.env.BASE_URL;
 
@@ -85,9 +85,13 @@ const processSteps = [
   { title: "Build with regular updates", text: "Short progress updates so you always know where things stand." },
   { title: "Handover with documentation", text: "Working system, documentation and a walkthrough for your team." },
 ];
-const headline = "I build cloud infrastructure and AI automation for startups and small teams."
-  .split(" ")
-  .map((word) => ({ word, accent: word === "AI" || word === "automation" }));
+// Two-tone headline: a strong first sentence, then a softer continuation in the same size.
+const headlineLead = "Cloud infrastructure and AI automation for growing teams.";
+const headlineRest = "Reliable deployments, less manual work, systems your team can run.";
+const headline = [
+  ...headlineLead.split(" ").map((word) => ({ word, rest: false })),
+  ...headlineRest.split(" ").map((word) => ({ word, rest: true })),
+];
 
 // Brand marks from simple-icons (CC0). AWS is not in that set, so it gets a plain cloud glyph.
 const cloudPath = "M6.5 19a5 5 0 0 1-.9-9.92A6.5 6.5 0 0 1 18.3 8.6 5.25 5.25 0 0 1 17.75 19Z";
@@ -111,32 +115,19 @@ const tools = toolIcons.map((tool) => ({ ...tool, path: tool.path ?? cloudPath }
   <div class="site-shell">
     <main id="main">
       <section class="hero" id="top">
-        <HeroBackground />
+        <HeroRibbon />
         <div class="hero-copy">
-          <p class="hero-kicker"><span class="status-dot" aria-hidden="true"></span>Freelance cloud &amp; AI engineer · taking new projects</p>
-          <h1 aria-label="I build cloud infrastructure and AI automation for startups and small teams.">{headline.map((item, index) => <><span class:list={["w", item.accent && "accent"]} style={`--w: ${index}`} aria-hidden="true">{item.word}</span>{" "}</>)}</h1>
-          <p class="hero-description">Reliable deployments, less manual work and practical systems that your team can understand and maintain.</p>
+          <p class="hero-kicker"><span class="status-dot" aria-hidden="true"></span>Freelance cloud &amp; AI engineer · <span>taking new projects</span></p>
+          <h1 aria-label={`${headlineLead} ${headlineRest}`}>{headline.map((item, index) => <><span class:list={["w", item.rest && "rest"]} style={`--w: ${index}`} aria-hidden="true">{item.word}</span>{" "}</>)}</h1>
           <div class="hero-actions">
             <a class="button button-primary" href="#contact">Get a quote <span aria-hidden="true">→</span></a>
             <a class="button button-secondary" href="#work">See my work <span aria-hidden="true">↓</span></a>
           </div>
           <p class="trust-line">Code merged into <strong>PyPA build</strong> and <strong>Terrakube</strong> · Client work for <strong>Racoona</strong></p>
         </div>
-        <div class="hero-visual">
-          <div class="tilt" data-tilt>
-            <InfraMap />
-          </div>
-        </div>
-      </section>
-
-      <section class="credibility" aria-label="Credibility">
-        <div><strong data-count="5">5</strong><span>merged open-source PRs<br />PyPA build · Terrakube</span></div>
-        <div><strong data-count="2">2</strong><span>client projects delivered<br />AI infrastructure · Racoona</span></div>
-        <div><strong data-count="3" data-suffix="×">3×</strong><span>hackathon finalist<br />as team lead</span></div>
       </section>
 
       <section class="tools" aria-label="Tools I work with">
-        <p>Tools I work with</p>
         <div class="marquee">
           <div class="marquee-track">
             {[...tools, ...tools].map((tool, index) => (
@@ -147,6 +138,26 @@ const tools = toolIcons.map((tool) => ({ ...tool, path: tool.path ?? cloudPath }
             ))}
           </div>
         </div>
+      </section>
+
+      <section class="credibility" aria-label="Credibility">
+        <div><strong data-count="5">5</strong><span>merged open-source PRs<br />PyPA build · Terrakube</span></div>
+        <div><strong data-count="2">2</strong><span>client projects delivered<br />AI infrastructure · Racoona</span></div>
+        <div><strong data-count="3" data-suffix="×">3×</strong><span>hackathon finalist<br />as team lead</span></div>
+      </section>
+
+      <section class="section stack reveal" id="setup">
+        <div class="stack-copy">
+          <p class="eyebrow">A typical setup</p>
+          <h2>Built to run, not just to demo.</h2>
+          <p>Most projects end up with the same backbone: infrastructure defined in code, traffic spread across containers, a managed database and monitoring from day one. You get the setup and the notes to run it yourself.</p>
+          <ul class="stack-points">
+            <li><strong>Terraform</strong> for repeatable environments</li>
+            <li><strong>Kubernetes</strong> or containers behind a load balancer</li>
+            <li><strong>Prometheus &amp; Grafana</strong> so problems show up early</li>
+          </ul>
+        </div>
+        <InfraMap />
       </section>
 
       <section class="section reveal" id="services">

@@ -1,0 +1,180 @@
+---
+// Full-width hero backdrop: a silk-like ribbon made of a few hundred fine strands.
+// On load it sweeps in from the top, then keeps slowly twisting.
+// Pauses when off-screen or when the tab is hidden; reduced motion draws one still frame.
+---
+
+<div class="hero-bg" aria-hidden="true">
+  <canvas class="ribbon" data-ribbon></canvas>
+  <div class="guides"></div>
+</div>
+
+<script>
+  const canvas = document.querySelector<HTMLCanvasElement>("[data-ribbon]");
+  const context = canvas?.getContext("2d");
+
+  if (canvas && context) {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const STRANDS = 220;
+    const STEPS = 44;
+    const INTRO = 2200; // ms for the sweep-in
+
+    // Strand colours across the ribbon's width (sky → indigo → violet → teal).
+    const palette = [
+      [56, 189, 248],
+      [79, 70, 229],
+      [124, 58, 237],
+      [192, 132, 252],
+      [99, 102, 241],
+      [20, 184, 166],
+    ];
+
+    const mix = (t: number) => {
+      const scaled = t * (palette.length - 1);
+      const i = Math.min(palette.length - 2, Math.floor(scaled));
+      const f = scaled - i;
+      const [a, b] = [palette[i], palette[i + 1]];
+      return a.map((v, k) => Math.round(v + (b[k] - v) * f));
+    };
+
+    const colours = Array.from({ length: STRANDS }, (_, i) => mix(i / (STRANDS - 1)));
+
+    let width = 0;
+    let height = 0;
+    let ratio = 1;
+
+    const resize = () => {
+      ratio = Math.min(window.devicePixelRatio || 1, 1.5);
+      width = canvas.clientWidth;
+      height = canvas.clientHeight;
+      canvas.width = Math.round(width * ratio);
+      canvas.height = Math.round(height * ratio);
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    };
+
+    // Point on the ribbon's centre line (cubic Bézier), and its normal.
+    const centre = (s: number) => {
+      const narrow = width < 760;
+      const p0 = narrow ? [width * 0.45, -height * 0.15] : [width * 0.56, -height * 0.14];
+      const p1 = narrow ? [width * 0.95, height * 0.25] : [width * 0.86, height * 0.3];
+      const p2 = narrow ? [width * 0.6, height * 0.6] : [width * 0.7, height * 0.66];
+      const p3 = narrow ? [width * 1.15, height * 1.05] : [width * 1.02, height * 1.08];
+      const u = 1 - s;
+      const x = u * u * u * p0[0] + 3 * u * u * s * p1[0] + 3 * u * s * s * p2[0] + s * s * s * p3[0];
+      const y = u * u * u * p0[1] + 3 * u * u * s * p1[1] + 3 * u * s * s * p2[1] + s * s * s * p3[1];
+      const dx = 3 * u * u * (p1[0] - p0[0]) + 6 * u * s * (p2[0] - p1[0]) + 3 * s * s * (p3[0] - p2[0]);
+      const dy = 3 * u * u * (p1[1] - p0[1]) + 6 * u * s * (p2[1] - p1[1]) + 3 * s * s * (p3[1] - p2[1]);
+      const length = Math.hypot(dx, dy) || 1;
+      return { x, y, nx: -dy / length, ny: dx / length };
+    };
+
+    let samples: ReturnType<typeof centre>[] = [];
+    const sample = () => {
+      samples = Array.from({ length: STEPS + 1 }, (_, i) => centre(i / STEPS));
+    };
+
+    const draw = (time: number, reveal: number) => {
+      context.clearRect(0, 0, width, height);
+      const ribbon = Math.max(200, Math.min(width, 1600) * 0.3);
+      const last = Math.max(1, Math.round(STEPS * reveal));
+      const t = time * 0.00022;
+
+      context.lineWidth = 2;
+      for (let k = 0; k < STRANDS; k++) {
+        const across = k / (STRANDS - 1) - 0.5;
+        const [r, g, b] = colours[k];
+        context.strokeStyle = `rgba(${r},${g},${b},0.34)`;
+        context.beginPath();
+        for (let i = 0; i <= last; i++) {
+          const s = i / STEPS;
+          const point = samples[i];
+          // Twist: the ribbon's width swells and folds along its length over time.
+          const twist = 0.5 + 0.5 * Math.cos(s * 3.4 - t * 2 + across * 0.8);
+          const swell = 0.75 + 0.35 * Math.sin(s * 2.1 + t * 1.3);
+          const offset = across * ribbon * twist * swell + Math.sin(s * 5 + t * 3 + k * 0.02) * 6;
+          const x = point.x + point.nx * offset;
+          const y = point.y + point.ny * offset;
+          if (i === 0) context.moveTo(x, y);
+          else context.lineTo(x, y);
+        }
+        context.stroke();
+      }
+    };
+
+    let running = false;
+    let frame = 0;
+    let last = 0;
+    let begin = 0;
+
+    const ease = (x: number) => 1 - Math.pow(1 - x, 3);
+
+    const loop = (time: number) => {
+      if (!begin) begin = time;
+      if (time - last > 33) {
+        draw(time, ease(Math.min(1, (time - begin) / INTRO)));
+        last = time;
+      }
+      if (running) frame = requestAnimationFrame(loop);
+    };
+
+    const start = () => {
+      if (running || reduce) return;
+      running = true;
+      frame = requestAnimationFrame(loop);
+    };
+
+    const stop = () => {
+      running = false;
+      cancelAnimationFrame(frame);
+    };
+
+    resize();
+    sample();
+    if (reduce) draw(0, 1);
+
+    window.addEventListener("resize", () => {
+      resize();
+      sample();
+      draw(performance.now(), 1);
+    });
+
+    if (!reduce) {
+      new IntersectionObserver(([entry]) => (entry.isIntersecting ? start() : stop())).observe(canvas);
+      document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
+    }
+  }
+</script>
+
+<style>
+  .hero-bg {
+    position: absolute;
+    top: -72px;
+    bottom: 0;
+    left: 50%;
+    z-index: -1;
+    width: 100vw;
+    margin-left: -50vw;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .ribbon {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Faint vertical guide lines at the content edges. */
+  .guides {
+    position: absolute;
+    inset: 0;
+    width: min(calc(100% - 48px), 1200px);
+    margin-inline: auto;
+    border-inline: 1px dashed rgba(31, 48, 71, 0.08);
+  }
+
+  @media (max-width: 960px) {
+    .ribbon { opacity: 0.32; }
+  }
+</style>

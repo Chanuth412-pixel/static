@@ -56,12 +56,14 @@ const featuredWork = [
 const moreWork = [
   {
     title: "GloveXcel",
+    tone: "iot",
     description: "IoT rehabilitation glove with sensor processing, BLE communication and web APIs.",
     tags: ["ESP32", "BLE", "React", "Node.js"],
     links: [{ kind: "code", label: "Code", href: "https://github.com/cepdnaclk/e21-3yp-GloveXcel" }],
   },
   {
     title: "FreeIPA migration",
+    tone: "identity",
     description: "Moved legacy OpenLDAP to centralized FreeIPA on AlmaLinux 9 with Podman and Keycloak SSO.",
     tags: ["FreeIPA", "Keycloak", "Podman"],
     links: [
@@ -71,6 +73,7 @@ const moreWork = [
   },
   {
     title: "Agrimate",
+    tone: "agri",
     description: "Bilingual farmer-to-customer marketplace with crop-care advice and delivery routing.",
     tags: ["Flutter", "Node.js", "Firebase"],
     links: [
@@ -343,10 +346,22 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
         </div>
         <div class="more-work">
           <h3>More projects</h3>
-          <div data-stagger>
+          <div class="more-grid" data-stagger>
             {moreWork.map((project) => (
-              <article>
-                <div><h4>{project.title}</h4><p>{project.description}</p></div>
+              <article class:list={["more-card", `tone-${project.tone}`]} data-spotlight>
+                <span class="more-icon" aria-hidden="true">
+                  {project.tone === "iot" && (
+                    <svg viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2" /><path d="M10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4" /></svg>
+                  )}
+                  {project.tone === "identity" && (
+                    <svg viewBox="0 0 24 24"><circle cx="8" cy="15" r="4" /><path d="m11 12 8-8M16 7l2 2M18 5l2 2" /></svg>
+                  )}
+                  {project.tone === "agri" && (
+                    <svg viewBox="0 0 24 24"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14Z" /><path d="M5 19 13 11" /></svg>
+                  )}
+                </span>
+                <h4>{project.title}</h4>
+                <p>{project.description}</p>
                 <ul class="tag-list">{project.tags.map((tag) => <li>{tag}</li>)}</ul>
                 <div class="project-links">
                   {project.links.map((link) => {

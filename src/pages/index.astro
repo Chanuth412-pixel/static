@@ -1,0 +1,570 @@
+
+---
+
+import BaseLayout from "../layouts/BaseLayout.astro";
+import HeroSystems from "../components/HeroSystems.astro";
+import ProjectVisual from "../components/ProjectVisual.astro";
+
+const base = import.meta.env.BASE_URL;
+
+const projects = [
+  {
+    number: "01",
+    type: "AI / INFRASTRUCTURE",
+    title: "AI-Powered Infrastructure Generation",
+    description:
+      "Built a multi-agent AI system that generates context-aware Terraform configurations using LLMs and RAG. Integrated AWS deployment, validation and post-deployment checks.",
+    stack: ["Python", "LangGraph", "Ollama", "RAG", "AWS", "Terraform"],
+    visual: "ai",
+    status: "CLIENT WORK / DEPLOYED",
+  },
+  {
+    number: "02",
+    type: "PLATFORM ENGINEERING",
+    title: "Peracom Internal Developer Platform",
+    description:
+      "Developed an internal platform to automate infrastructure provisioning and deployment using Terraform, Ansible and Kubernetes, with Prometheus and Grafana monitoring.",
+    stack: ["Proxmox", "Terraform", "Ansible", "Kubernetes", "Grafana"],
+    visual: "platform",
+    status: "INFRASTRUCTURE PROJECT",
+  },
+  {
+    number: "03",
+    type: "IOT / HEALTHCARE",
+    title: "GloveXcel",
+    description:
+      "Developed an IoT rehabilitation glove for monitoring hand movements, using ESP32 sensor processing, BLE communication, real-time APIs and a 3D hand interface.",
+    stack: ["ESP32", "BLE", "React", "Node.js", "MongoDB", "PostgreSQL"],
+    visual: "iot",
+    status: "UNIVERSITY PROJECT",
+    href: "https://github.com/cepdnaclk/e21-3yp-GloveXcel",
+    linkLabel: "GitHub repository",
+  },
+  {
+    number: "04",
+    type: "LINUX / IDENTITY MANAGEMENT",
+    title: "FreeIPA Identity Management Migration",
+    description:
+      "Migrated legacy OpenLDAP infrastructure to centralized FreeIPA. Used Podman on AlmaLinux 9 and integrated Keycloak with Google Workspace for SSO.",
+    stack: ["FreeIPA", "OpenLDAP", "Podman", "AlmaLinux", "Keycloak"],
+    visual: "identity",
+    status: "INFRASTRUCTURE PROJECT",
+  },
+  {
+    number: "05",
+    type: "MACHINE LEARNING / RESEARCH",
+    title: "Clinical Time-Series Prediction",
+    description:
+      "Developing ML pipelines for multivariate clinical time-series prediction, including temporal feature engineering, data imputation and evaluation across different sampling intervals.",
+    stack: ["Python", "Pandas", "NumPy", "Scikit-learn", "XGBoost", "LightGBM"],
+    visual: "research",
+    status: "ONGOING RESEARCH",
+  },
+  {
+    number: "06",
+    type: "MOBILE / AGRITECH",
+    title: "Agrimate",
+    description:
+      "Developed a bilingual farmer-to-customer marketplace with weather-based crop-care recommendations using GenAI and an efficient delivery-routing algorithm.",
+    stack: ["Flutter", "Node.js", "Firebase", "GenAI", "OpenWeather"],
+    visual: "agri",
+    status: "UNIVERSITY PROJECT",
+  },
+  {
+    number: "07",
+    type: "WEB DEVELOPMENT / CLIENT WORK",
+    title: "Racoona",
+    description:
+      "Developed and maintained static website pages using Astro, JavaScript, HTML and CSS, with integrated contact forms and email delivery.",
+    stack: ["Astro", "JavaScript", "HTML", "CSS", "Web3Forms"],
+    visual: "web",
+    status: "CLIENT WORK",
+    href: "https://racoona.ai/",
+    linkLabel: "Live website",
+  },
+];
+
+const skillGroups = [
+  {
+    title: "Software Development",
+    number: "01",
+    skills: ["Python", "JavaScript", "TypeScript", "React", "Node.js", "Astro", "Flutter"],
+  },
+  {
+    title: "AI & Machine Learning",
+    number: "02",
+    skills: ["LangGraph", "Ollama", "RAG", "Pandas", "NumPy", "Scikit-learn", "XGBoost", "LightGBM"],
+  },
+  {
+    title: "Cloud & Infrastructure",
+    number: "03",
+    skills: ["AWS", "Terraform", "Ansible", "Kubernetes", "Proxmox", "Podman", "Linux"],
+  },
+  {
+    title: "Databases & Systems",
+    number: "04",
+    skills: ["PostgreSQL", "MongoDB", "Firebase", "FreeIPA", "Keycloak", "Prometheus", "Grafana"],
+  },
+];
+---
+
+<BaseLayout
+  title="Chanuth Abeynayake | Engineering Portfolio"
+  description="Software engineering, AI systems, infrastructure automation and applied research."
+>
+  <div class="site-shell">
+
+    <!-- NAVIGATION -->
+    <header class="site-header">
+      <a class="brand" href={base} aria-label="Home">
+        CA<span>.</span>
+      </a>
+
+      <nav aria-label="Main navigation">
+        <a href="#work">Work</a>
+        <a href="#about">About</a>
+        <a href="#skills">Skills</a>
+        <a href="#open-source">Open source</a>
+      </nav>
+
+      <a class="nav-contact" href="#contact">
+        Let's talk <span>↗</span>
+      </a>
+    </header>
+
+    <main id="main">
+
+      <!-- HERO -->
+      <section class="hero" id="top">
+
+        <div class="hero-copy">
+
+          <p class="hero-eyebrow">
+            <span class="live-dot"></span>
+            COMPUTER ENGINEERING / UNIVERSITY OF PERADENIYA
+          </p>
+
+          <h1 class="hero-title">
+            Understanding systems.
+            <span>Building what works.</span>
+          </h1>
+
+          <p class="hero-description">
+            I'm a Computer Engineering undergraduate interested in
+            understanding complex systems and building practical
+            solutions across software, AI and infrastructure.
+          </p>
+
+          <div class="hero-actions">
+            <a href="#work" class="primary-button">
+              Explore my work <span>↘</span>
+            </a>
+
+            <a href={`${base}cv.pdf`} class="text-link" download>
+              Download CV <span>↗</span>
+            </a>
+          </div>
+
+          <div class="hero-meta">
+            <span>Sri Lanka</span>
+            <span>3.70 GPA</span>
+            <span>Open to opportunities</span>
+          </div>
+
+        </div>
+
+        <!-- Animation -->
+        <HeroSystems />
+
+      </section>
+
+      <!-- PROOF STRIP -->
+      <section class="proof-strip" aria-label="Profile highlights">
+
+        <div class="proof-item">
+          <span class="proof-number">3.70</span>
+          <span class="proof-label">CURRENT GPA</span>
+        </div>
+
+        <div class="proof-item">
+          <span class="proof-number">02</span>
+          <span class="proof-label">MERGED OPEN-SOURCE PRs</span>
+        </div>
+
+        <div class="proof-item">
+          <span class="proof-number">07</span>
+          <span class="proof-label">SELECTED PROJECTS</span>
+        </div>
+
+        <div class="proof-item">
+          <span class="proof-number">03</span>
+          <span class="proof-label">COMPETITION FINALIST ACHIEVEMENTS</span>
+        </div>
+
+      </section>
+
+      <!-- INTRODUCTION -->
+      <section class="intro-section">
+
+        <p class="section-label">01 / INTRODUCTION</p>
+
+        <div class="intro-copy">
+          <h2>
+            My work sits between
+            <span>software, infrastructure and problem-solving.</span>
+          </h2>
+
+          <p>
+            I enjoy exploring unfamiliar technologies, understanding
+            how systems work and building practical solutions.
+            My experience includes client development, infrastructure
+            automation, IoT engineering, machine-learning research
+            and open-source contributions.
+          </p>
+        </div>
+
+      </section>
+
+      <!-- PROJECTS -->
+      <section class="content-section" id="work">
+
+        <div class="section-heading">
+          <div>
+            <p class="section-label">02 / SELECTED WORK</p>
+            <h2>Engineering in practice.</h2>
+          </div>
+
+          <p>
+            Client work, infrastructure projects, university
+            engineering and ongoing research.
+          </p>
+        </div>
+
+        
+        <div class="project-grid">
+
+          {projects.map((project) => (
+            <article class="project-card">
+
+              <div class="project-card-top">
+                <span>{project.number} / 07</span>
+                <span>{project.type}</span>
+              </div>
+
+              <!-- Project-specific animated visual -->
+              <ProjectVisual kind={project.visual} />
+
+              <div class="project-card-body">
+
+                <h3>{project.title}</h3>
+
+                <p class="project-description">
+                  {project.description}
+                </p>
+
+                <div class="technology-list">
+                  {project.stack.map((technology) => (
+                    <span>{technology}</span>
+                  ))}
+                </div>
+
+                <div class="project-card-footer">
+
+                  <span>{project.status}</span>
+
+                  {project.href && (
+                    <a
+                      href={project.href}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {project.linkLabel ?? "View project"} ↗
+                    </a>
+                  )}
+
+                </div>
+
+              </div>
+
+            </article>
+          ))}
+
+        </div>
+
+      </section>
+
+      <!-- OPEN SOURCE -->
+      <section class="content-section" id="open-source">
+
+        <div class="section-heading">
+          <div>
+            <p class="section-label">03 / OPEN SOURCE</p>
+            <h2>Contributing to real codebases.</h2>
+          </div>
+
+          <p>
+            Identifying issues, improving existing systems
+            and contributing tested fixes.
+          </p>
+        </div>
+
+        <div class="contribution-list">
+
+          <article class="contribution-row">
+            <div class="contribution-index">01</div>
+
+            <div class="contribution-main">
+              <span>PYTHON PACKAGING AUTHORITY</span>
+              <h3>PyPA / build</h3>
+
+              <p>
+                Fixed incorrect troubleshooting suggestions when
+                build isolation is disabled and added test coverage.
+              </p>
+            </div>
+
+            <div class="contribution-status">
+              <span class="merged-status">● MERGED</span>
+              <a
+                href="https://github.com/pypa/build/pull/1283"
+                target="_blank"
+                rel="noreferrer"
+              >
+                PR #1283 ↗
+              </a>
+            </div>
+          </article>
+
+          <article class="contribution-row">
+            <div class="contribution-index">02</div>
+
+            <div class="contribution-main">
+              <span>TERRAKUBE</span>
+              <h3>Infrastructure as Code Platform</h3>
+
+              <p>
+                Fixed repository URL parsing to correctly remove
+                trailing .git without affecting hostnames or
+                repository names, with regression tests.
+              </p>
+            </div>
+
+            <div class="contribution-status">
+              <span class="merged-status">● MERGED</span>
+              <span>PR #3922</span>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- ABOUT -->
+      <section class="content-section" id="about">
+
+        <div class="section-heading">
+          <div>
+            <p class="section-label">04 / ABOUT</p>
+            <h2>Beyond the projects.</h2>
+          </div>
+        </div>
+
+        <div class="about-grid">
+
+          <div class="about-copy">
+            <p>
+              I'm currently pursuing Computer Engineering at the
+              University of Peradeniya.
+            </p>
+
+            <p>
+              Alongside my academic work, I've worked on client
+              projects involving software development and AI-powered
+              infrastructure, while exploring Linux systems,
+              automation and cloud technologies.
+            </p>
+
+            <p>
+              I also enjoy working on open-source projects and
+              understanding how existing systems are designed,
+              maintained and improved.
+            </p>
+          </div>
+
+          <div class="about-facts">
+
+            <div>
+              <span>EDUCATION</span>
+              <strong>Computer Engineering</strong>
+              <small>University of Peradeniya</small>
+            </div>
+
+            <div>
+              <span>CURRENT GPA</span>
+              <strong>3.70</strong>
+              <small>Undergraduate studies</small>
+            </div>
+
+            <div>
+              <span>WORK</span>
+              <strong>Freelance & Client Projects</strong>
+              <small>Software and infrastructure</small>
+            </div>
+
+            <div>
+              <span>LOCATION</span>
+              <strong>Sri Lanka</strong>
+              <small>Open to remote opportunities</small>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- SKILLS -->
+      <section class="content-section" id="skills">
+
+        <div class="section-heading">
+          <div>
+            <p class="section-label">05 / TECHNOLOGIES</p>
+            <h2>Tools and technologies.</h2>
+          </div>
+
+          <p>
+            Technologies used across my projects,
+            research and engineering work.
+          </p>
+        </div>
+
+        <div class="skills-grid">
+
+          {skillGroups.map((group) => (
+            <article class="skill-card">
+              <div class="skill-card-heading">
+                <span>{group.number}</span>
+                <h3>{group.title}</h3>
+              </div>
+
+              <div class="skill-tags">
+                {group.skills.map((skill) => (
+                  <span>{skill}</span>
+                ))}
+              </div>
+            </article>
+          ))}
+
+        </div>
+      </section>
+
+      <!-- ACHIEVEMENTS -->
+      <section class="content-section" id="recognition">
+
+        <div class="section-heading">
+          <div>
+            <p class="section-label">06 / RECOGNITION</p>
+            <h2>Competitions & learning.</h2>
+          </div>
+        </div>
+
+        <div class="achievement-grid">
+
+          <article class="achievement-card">
+            <span>2026</span>
+            <h3>SLASSCOM Xcelerate</h3>
+            <p>Top 12 Finalist · Team Leader</p>
+          </article>
+
+          <article class="achievement-card">
+            <span>2026</span>
+            <h3>SLIIT CodeFest / Innov IoT</h3>
+            <p>Top 10 Finalist · Team Leader</p>
+          </article>
+
+          <article class="achievement-card">
+            <span>2025</span>
+            <h3>SLT CodeBlast</h3>
+            <p>Top 10 Finalist · Team Leader</p>
+          </article>
+
+        </div>
+
+        <div class="certifications">
+          <span>CERTIFICATIONS</span>
+
+          <div>
+            <p>AWS Cloud Technical Essentials — Amazon Web Services</p>
+            <p>Advanced Learning Algorithms — DeepLearning.AI / Stanford University</p>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- CONTACT -->
+      <section class="contact-panel" id="contact">
+
+        <p class="section-label">07 / CONTACT</p>
+
+        <h2>
+          Let's work on
+          <span>something meaningful.</span>
+        </h2>
+
+        <p>
+          Interested in software engineering, AI systems,
+          infrastructure or challenging technical projects?
+          I'd be happy to connect.
+        </p>
+
+        <a
+          class="contact-email"
+          href="mailto:chanuth412@gmail.com"
+        >
+          chanuth412@gmail.com ↗
+        </a>
+
+        <div class="social-links">
+          <a
+            href="https://github.com/YOUR_GITHUB_USERNAME"
+            target="_blank"
+            rel="noreferrer"
+          >
+            GitHub ↗
+          </a>
+
+          <a
+            href="YOUR_LINKEDIN_URL"
+            target="_blank"
+            rel="noreferrer"
+          >
+            LinkedIn ↗
+          </a>
+
+          <a
+            href="YOUR_UPWORK_URL"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Upwork ↗
+          </a>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <a class="brand" href={base}>CA<span>.</span></a>
+
+      <p>Designed and developed by Chanuth Abeynayake.</p>
+
+      <a href="#top">Back to top ↑</a>
+    </footer>
+
+  </div>
+</BaseLayout>
+
+<script>
+  import { initPortfolioMotion } from "../scripts/motion";
+
+  initPortfolioMotion();
+</script>

@@ -1,0 +1,407 @@
+
+---
+interface Props {
+  kind: "ai" | "platform" | "iot" | "identity" | "research" | "agri" | "web";
+}
+
+const { kind } = Astro.props;
+---
+
+<div class:list={["project-visual", `project-visual--${kind}`]}
+  aria-hidden="true">
+
+  <!-- AI AGENT PIPELINE -->
+  {kind === "ai" && (
+    <div class="ai-pipeline">
+      <div class="pv-kicker">
+        <span>AGENTIC WORKFLOW</span>
+        <span>01 / 07</span>
+      </div>
+
+      <div class="ai-input">
+        <span class="pv-symbol">⌘</span>
+        <span>Infrastructure request</span>
+        <small>INPUT</small>
+      </div>
+
+      <div class="flow-stem"><i></i></div>
+
+      <div class="ai-orchestrator">
+        <span class="orchestrator-pulse"></span>
+        <div>
+          <strong>LANGGRAPH ORCHESTRATOR</strong>
+          <small>Task planning & coordination</small>
+        </div>
+        <span class="node-state">ACTIVE</span>
+      </div>
+
+      <div class="ai-agents">
+
+        <div class="ai-agent agent-llm">
+          <span class="agent-symbol">✳</span>
+          <div>
+            <strong>LLM AGENT</strong>
+            <small>Configuration generation</small>
+          </div>
+          <span class="agent-number">01</span>
+        </div>
+
+        <div class="ai-agent agent-rag">
+          <span class="agent-symbol">◈</span>
+          <div>
+            <strong>RAG AGENT</strong>
+            <small>Context retrieval</small>
+          </div>
+          <span class="agent-number">02</span>
+        </div>
+
+      </div>
+
+      <div class="flow-stem"><i></i></div>
+
+      <div class="ai-terraform">
+        <span class="pv-symbol">⌘</span>
+        <strong>Terraform Configuration</strong>
+        <span class="node-state">GENERATED</span>
+      </div>
+
+      <div class="flow-stem"><i></i></div>
+
+      <div class="ai-deployment">
+        <span class="aws-symbol">☁</span>
+        <strong>AWS DEPLOYMENT</strong>
+        <small>Validation / Security / Checks</small>
+      </div>
+    </div>
+  )}
+
+  <!-- PERACOM INFRASTRUCTURE PIPELINE -->
+  {kind === "platform" && (
+    <div class="infra-visual">
+
+      <div class="pv-kicker">
+        <span>INFRASTRUCTURE PIPELINE</span>
+        <span>02 / 07</span>
+      </div>
+
+      <div class="infra-track">
+
+        <div class="infra-node">
+          <span>01</span>
+          <strong>PROXMOX</strong>
+          <small>Virtualisation</small>
+        </div>
+
+        <i class="infra-arrow">→</i>
+
+        <div class="infra-node">
+          <span>02</span>
+          <strong>TERRAFORM</strong>
+          <small>Provisioning</small>
+        </div>
+
+        <i class="infra-arrow">→</i>
+
+        <div class="infra-node">
+          <span>03</span>
+          <strong>ANSIBLE</strong>
+          <small>Configuration</small>
+        </div>
+
+        <i class="infra-arrow">→</i>
+
+        <div class="infra-node infra-node-active">
+          <span>04</span>
+          <strong>K8S</strong>
+          <small>Deployment</small>
+        </div>
+
+      </div>
+
+      <div class="infra-result">
+        <div>
+          <span class="infra-status-dot"></span>
+          MONITORING & OBSERVABILITY
+        </div>
+        <strong>PROMETHEUS <span>+</span> GRAFANA</strong>
+      </div>
+
+      <div class="infra-pulse-line"></div>
+    </div>
+  )}
+
+  <!-- GLOVEXCEL SENSOR ANIMATION -->
+  {kind === "iot" && (
+    <div class="iot-visual">
+
+      <div class="pv-kicker">
+        <span>WEARABLE SENSOR SYSTEM</span>
+        <span>03 / 07</span>
+      </div>
+
+      <div class="iot-layout">
+
+        <svg class="glove-svg" viewBox="0 0 190 175">
+
+          <path class="glove-outline"
+            d="M58 139 L51 86 Q49 73 59 71 Q69 69 72 83
+            L77 105 L78 42 Q78 28 89 28 Q100 28 100 43
+            L99 104 L109 52 Q112 39 122 42 Q133 45 129 58
+            L116 108 L134 81 Q141 69 151 76 Q161 84 152 96
+            L131 139 Q119 159 94 159 Q70 159 58 139 Z" />
+
+          <path class="glove-wrist" d="M67 144 Q93 154 122 143" />
+
+          <circle class="sensor-dot sensor-one" cx="65" cy="83" r="5" />
+          <circle class="sensor-dot sensor-two" cx="89" cy="42" r="5" />
+          <circle class="sensor-dot sensor-three" cx="120" cy="53" r="5" />
+          <circle class="sensor-dot sensor-four" cx="145" cy="84" r="5" />
+          <circle class="sensor-dot sensor-five" cx="94" cy="129" r="5" />
+
+        </svg>
+
+        <div class="iot-data">
+
+          <span class="iot-data-label">SENSOR STREAM</span>
+
+          <div class="sensor-reading">
+            <span>FINGER 01</span>
+            <strong>ACTIVE</strong>
+          </div>
+
+          <div class="sensor-reading">
+            <span>FINGER 02</span>
+            <strong>ACTIVE</strong>
+          </div>
+
+          <div class="sensor-reading">
+            <span>FINGER 03</span>
+            <strong>ACTIVE</strong>
+          </div>
+
+          <div class="sensor-reading">
+            <span>FINGER 04</span>
+            <strong>ACTIVE</strong>
+          </div>
+
+          <div class="sensor-reading">
+            <span>FINGER 05</span>
+            <strong>ACTIVE</strong>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="iot-bottom">
+        <span>ESP32</span>
+        <span>BLE</span>
+        <span>REAL-TIME API</span>
+        <span>3D HAND UI</span>
+      </div>
+
+    </div>
+  )}
+
+  <!-- FREEIPA IDENTITY FLOW -->
+  {kind === "identity" && (
+    <div class="identity-visual">
+
+      <div class="pv-kicker">
+        <span>IDENTITY MANAGEMENT</span>
+        <span>04 / 07</span>
+      </div>
+
+      <div class="identity-track">
+
+        <div class="identity-node">
+          <span>01</span>
+          <strong>OpenLDAP</strong>
+          <small>Legacy directory</small>
+        </div>
+
+        <div class="identity-connector">→</div>
+
+        <div class="identity-node identity-primary">
+          <span>02</span>
+          <strong>FreeIPA</strong>
+          <small>Central identity</small>
+        </div>
+
+        <div class="identity-connector">→</div>
+
+        <div class="identity-node">
+          <span>03</span>
+          <strong>Keycloak</strong>
+          <small>Authentication</small>
+        </div>
+
+        <div class="identity-connector">→</div>
+
+        <div class="identity-node">
+          <span>04</span>
+          <strong>Google</strong>
+          <small>Workspace SSO</small>
+        </div>
+
+      </div>
+
+      <div class="identity-security">
+        <span class="security-icon">⌑</span>
+        CENTRALIZED IDENTITY / SINGLE SIGN-ON
+        <span class="security-indicator"></span>
+      </div>
+
+    </div>
+  )}
+
+  <!-- CLINICAL TIME SERIES -->
+  {kind === "research" && (
+    <div class="research-visual">
+
+      <div class="pv-kicker">
+        <span>CLINICAL TIME-SERIES</span>
+        <span>05 / 07</span>
+      </div>
+
+      <div class="research-graph">
+
+        <div class="graph-y-label">SIGNAL</div>
+
+        <svg viewBox="0 0 440 145" preserveAspectRatio="none">
+
+          <defs>
+            <linearGradient id="research-fill" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#718c70" stop-opacity=".20"/>
+              <stop offset="100%" stop-color="#718c70" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+
+          <path class="graph-grid-line" d="M0 25 H440 M0 65 H440 M0 105 H440" />
+
+          <path class="research-area"
+            d="M0 90 L20 85 L40 95 L60 51 L80 65 L100 42
+            L120 74 L140 85 L160 55 L180 70 L200 32
+            L220 48 L240 81 L260 64 L280 40 L300 58
+            L320 25 L340 55 L360 70 L380 42 L400 52
+            L420 30 L440 38 L440 145 L0 145 Z" />
+
+          <path class="research-line"
+            d="M0 90 L20 85 L40 95 L60 51 L80 65 L100 42
+            L120 74 L140 85 L160 55 L180 70 L200 32
+            L220 48 L240 81 L260 64 L280 40 L300 58
+            L320 25 L340 55 L360 70 L380 42 L400 52
+            L420 30 L440 38" />
+
+          <circle class="research-point" cx="320" cy="25" r="5" />
+
+        </svg>
+
+        <div class="graph-x-label">TIME →</div>
+
+      </div>
+
+      <div class="sampling-options">
+        <span>30 MIN</span>
+        <span>60 MIN</span>
+        <span>120 MIN</span>
+      </div>
+
+      <div class="research-footer">
+        <span>FEATURE ENGINEERING</span>
+        <span>MODEL EVALUATION</span>
+        <span>EVENT PREDICTION</span>
+      </div>
+
+    </div>
+  )}
+
+  <!-- AGRIMATE DELIVERY ROUTING -->
+  {kind === "agri" && (
+    <div class="agri-visual">
+
+      <div class="pv-kicker">
+        <span>AGRICULTURAL MARKETPLACE</span>
+        <span>06 / 07</span>
+      </div>
+
+      <svg class="route-svg" viewBox="0 0 440 150"
+        preserveAspectRatio="none">
+
+        <path class="route-base"
+          d="M45 110 Q100 15 160 65 T300 35 T395 100" />
+
+        <path class="route-active"
+          d="M45 110 Q100 15 160 65 T300 35 T395 100" />
+
+        <circle class="route-marker" cx="45" cy="110" r="8" />
+        <circle class="route-marker route-marker-two" cx="160" cy="65" r="8" />
+        <circle class="route-marker route-marker-three" cx="300" cy="35" r="8" />
+        <circle class="route-marker route-marker-four" cx="395" cy="100" r="8" />
+
+      </svg>
+
+      <div class="route-labels">
+        <span>FARMER</span>
+        <span>MARKET</span>
+        <span>ROUTE</span>
+        <span>CUSTOMER</span>
+      </div>
+
+      <div class="agri-footer">
+        <span>GREEDY NEAREST-NEIGHBOR</span>
+        <span>DELIVERY OPTIMIZATION</span>
+      </div>
+
+    </div>
+  )}
+
+  <!-- RACOONA WEBSITE -->
+  {kind === "web" && (
+    <div class="web-visual">
+
+      <div class="pv-kicker">
+        <span>WEB DEVELOPMENT</span>
+        <span>07 / 07</span>
+      </div>
+
+      <div class="web-browser">
+
+        <div class="web-browser-top">
+          <div class="browser-dots">
+            <i></i><i></i><i></i>
+          </div>
+
+          <span>racoona.ai</span>
+          <span>↗</span>
+        </div>
+
+        <div class="web-browser-content">
+
+          <span class="web-brand">RACOONA.</span>
+
+          <div class="web-heading-line"></div>
+          <div class="web-heading-line short"></div>
+
+          <div class="web-copy-line"></div>
+          <div class="web-copy-line smaller"></div>
+
+          <div class="web-action-row">
+            <span class="web-button"></span>
+            <span class="web-email-status">
+              <i></i> EMAIL INTEGRATION
+            </span>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="web-footer">
+        ASTRO / WEB3FORMS / EMAIL DELIVERY
+      </div>
+
+    </div>
+  )}
+
+</div>

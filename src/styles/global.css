@@ -571,31 +571,31 @@ a {
   display: none;
 }
 
+/* Soft tinted tile with a line icon in the card's colour: calm, no gradient or glow. */
 .service-icon {
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
-  margin-bottom: 26px;
-  border-radius: 13px;
-  background: var(--icon);
-  color: #fff;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.45) inset,
-    0 10px 22px -10px rgba(var(--tint), 0.75);
-  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+  width: 44px;
+  height: 44px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(var(--tint), 0.16);
+  border-radius: 11px;
+  background: rgba(var(--tint), 0.08);
+  color: rgb(var(--tint));
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .service-card:hover .service-icon {
-  transform: translateY(-2px) rotate(-4deg);
+  background: rgba(var(--tint), 0.13);
+  border-color: rgba(var(--tint), 0.28);
 }
 
 .service-icon svg {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.9;
+  stroke-width: 1.7;
   stroke-linecap: round;
   stroke-linejoin: round;
 }

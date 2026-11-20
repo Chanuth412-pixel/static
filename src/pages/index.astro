@@ -101,14 +101,14 @@ const linkIcon = (href: string, kind: string) => {
 
 // Merged open-source pull requests, newest first. Stars as of Nov 2026.
 const pullRequests = [
-  { repo: "kubescape/kubescape", name: "Kubescape", stars: "12k", lang: "Go", number: 5233, title: "Report latest-version lookup failures in the installer", featured: true },
-  { repo: "kubescape/kubescape", name: "Kubescape", stars: "12k", lang: "Go", number: 5177, title: "Correct the shell completion instructions" },
-  { repo: "pypa/build", name: "PyPA build", stars: "865", lang: "Python", number: 1283, title: "Fix the troubleshooting hint when build isolation is disabled", featured: true },
-  { repo: "terrakube-io/terrakube", name: "Terrakube", stars: "1k", lang: "Java", number: 3922, title: "Correctly remove a trailing .git from repository URLs", featured: true },
-  { repo: "home-assistant/home-assistant.io", name: "Home Assistant docs", stars: "10.2k", lang: "HTML", number: 50530, title: "Fix broken FAQ links", featured: true },
-  { repo: "terrakube-io/terrakube", name: "Terrakube", stars: "1k", lang: "Java", number: 3921, title: "Fix the telemetry Docker Compose instructions" },
-  { repo: "pypa/build", name: "PyPA build", stars: "865", lang: "Python", number: 1282, title: "Update macOS runners in the CI documentation" },
-  { repo: "pypa/build", name: "PyPA build", stars: "865", lang: "Python", number: 1281, title: "Fix the missing src directory in the tutorial" },
+  { repo: "kubescape/kubescape", name: "Kubescape", stars: "12k", lang: "Go", number: 5266, type: "Feature", featured: true, title: "Suggest values for the list and download commands in shell completion" },
+  { repo: "kubescape/kubescape", name: "Kubescape", stars: "12k", lang: "Go", number: 5233, type: "Fix", featured: true, title: "Report latest-version lookup failures in the installer" },
+  { repo: "kubescape/kubescape", name: "Kubescape", stars: "12k", lang: "Go", number: 5177, type: "Fix", title: "Correct the shell completion instructions" },
+  { repo: "pypa/build", name: "PyPA build", stars: "864", lang: "Python", number: 1283, type: "Fix", featured: true, title: "Fix the troubleshooting hint when build isolation is disabled" },
+  { repo: "terrakube-io/terrakube", name: "Terrakube", stars: "1k", lang: "Java", number: 3922, type: "Fix", featured: true, title: "Correctly remove a trailing .git from repository URLs" },
+  { repo: "home-assistant/home-assistant.io", name: "Home Assistant docs", stars: "10.2k", lang: "HTML", number: 50530, type: "Docs", title: "Fix broken FAQ links" },
+  { repo: "terrakube-io/terrakube", name: "Terrakube", stars: "1k", lang: "Java", number: 3921, type: "Docs", title: "Fix the telemetry Docker Compose instructions" },
+  { repo: "pypa/build", name: "PyPA build", stars: "864", lang: "Python", number: 1282, type: "Docs", title: "Update macOS runners in the CI documentation" },
 ].map((pr) => ({ ...pr, href: `https://github.com/${pr.repo}/pull/${pr.number}` }));
 const prProjects = [...new Set(pullRequests.map((pr) => pr.repo))];
 
@@ -183,7 +183,7 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
             <a class="button button-primary" href="#contact">Get a quote <span aria-hidden="true">→</span></a>
             <a class="button button-secondary" href="#work">See my work <span aria-hidden="true">↓</span></a>
           </div>
-          <p class="trust-line">Code merged into <strong>Kubescape</strong>, <strong>Home Assistant</strong>, <strong>PyPA build</strong> and <strong>Terrakube</strong> · Client work for <strong>Racoona</strong></p>
+          <p class="trust-line">Contributions merged into <strong>Kubescape</strong>, <strong>PyPA build</strong>, <strong>Terrakube</strong> and the <strong>Home Assistant docs</strong> · Client work for <strong>Racoona</strong></p>
         </div>
       </section>
 
@@ -203,7 +203,7 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
       <section class="credibility" aria-label="Credibility">
         <a href="#open-source">
           <span class="stat"><strong data-count={pullRequests.length}>{pullRequests.length}</strong></span>
-          <span><b>merged open-source PRs</b>Across 4 projects · Kubescape · Home Assistant · PyPA · Terrakube</span>
+          <span><b>merged open-source PRs</b>Across {prProjects.length} projects · Kubescape · Home Assistant · PyPA · Terrakube</span>
           <i aria-hidden="true">↓</i>
         </a>
         <a href="#contact">
@@ -368,7 +368,7 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
       <section class="section band reveal" id="open-source">
         <div class="section-heading">
           <div><p class="eyebrow">Open source</p><h2>Comfortable in other people's codebases.</h2></div>
-          <p>{pullRequests.length} merged fixes across {prProjects.length} projects.</p>
+          <p>{pullRequests.length} merged pull requests across {prProjects.length} projects, from Kubescape (12k★) to the Home Assistant docs, each reviewed against the project's own standards.</p>
         </div>
         <div class="pr-list" data-stagger>
           {pullRequests.filter((pr) => pr.featured).map((pr) => (
@@ -379,7 +379,7 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
               </span>
               <span class="pr-main">
                 <strong>{pr.title}</strong>
-                <small>#{pr.number}</small>
+                <small>#{pr.number} · {pr.type}</small>
               </span>
               <em>Merged</em>
               <span class="pr-arrow" aria-hidden="true">↗</span>
@@ -387,7 +387,7 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
           ))}
         </div>
         <details class="pr-more">
-          <summary class="project-link">Show 4 more</summary>
+          <summary class="project-link">Show {pullRequests.filter((pr) => !pr.featured).length} more</summary>
           <div class="pr-list pr-more-list" data-stagger>
             {pullRequests.filter((pr) => !pr.featured).map((pr) => (
               <a class="pr-row" data-spotlight href={pr.href} target="_blank" rel="noreferrer" aria-label={`${pr.title} — ${pr.repo} pull request #${pr.number}, merged`}>
@@ -397,7 +397,7 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
                 </span>
                 <span class="pr-main">
                   <strong>{pr.title}</strong>
-                  <small>#{pr.number}</small>
+                  <small>#{pr.number} · {pr.type}</small>
                 </span>
                 <em>Merged</em>
                 <span class="pr-arrow" aria-hidden="true">↗</span>

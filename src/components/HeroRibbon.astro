@@ -24,9 +24,8 @@
     uniform vec2 uP2;
     uniform vec2 uP3;
     varying vec2 vUv;
-    varying float vFacing;
-    varying float vDiffuse;
-    varying float vSpecular;
+    varying vec2 vSide;
+    varying float vTwist;
 
     vec2 curve(float s) {
       float u = 1.0 - s;
@@ -52,17 +51,10 @@
 
       vec2 p = curve(s) + n * (v * width * cos(twist) + sway);
 
-      // Surface normal in 3D (x right, y down, z towards the viewer).
-      // The cross-section is slightly curved, so light varies across the width (silk sheen).
-      float curl = v * 1.6;
-      vec3 normal = normalize(vec3(-n * sin(twist + curl), cos(twist + curl)));
-      if (normal.z < 0.0) normal = -normal;
-      vec3 light = normalize(vec3(-0.45, -0.55, 0.7));
-      vec3 halfway = normalize(light + vec3(0.0, 0.0, 1.0));
-
-      vFacing = cos(twist);
-      vDiffuse = max(dot(normal, light), 0.0);
-      vSpecular = pow(max(dot(normal, halfway), 0.0), 22.0);
+      // Lighting is computed per pixel in the fragment shader: done here, per vertex, it was
+      // interpolated across each triangle and the folds showed the mesh as stair-steps.
+      vSide = n;
+      vTwist = twist;
       vUv = aUv;
       gl_Position = vec4(p.x / uAspect * 2.0 - 1.0, 1.0 - p.y * 2.0, 0.0, 1.0);
     }
@@ -72,9 +64,8 @@
     precision highp float;
     uniform float uReveal;
     varying vec2 vUv;
-    varying float vFacing;
-    varying float vDiffuse;
-    varying float vSpecular;
+    varying vec2 vSide;
+    varying float vTwist;
 
     vec3 sky = vec3(0.42, 0.80, 1.00);
     vec3 indigo = vec3(0.45, 0.47, 1.00);
@@ -97,17 +88,36 @@
       float v = vUv.y;
       float k = clamp(s * 0.85 + v * 0.3 - 0.05, 0.0, 1.0);
 
-      vec3 colour = vFacing > 0.0 ? front(k) : back(k) * 0.95;
-      float facing = abs(vFacing);
+      // Surface normal in 3D (x right, y down, z towards the viewer).
+      // The cross-section is slightly curved, so light varies across the width (silk sheen).
+      vec2 side = normalize(vSide);
+      float curl = (v - 0.5) * 1.6;
+      vec3 normal = normalize(vec3(-side * sin(vTwist + curl), cos(vTwist + curl)));
+      vec3 light = normalize(vec3(-0.45, -0.55, 0.7));
+      vec3 halfway = normalize(light + vec3(0.0, 0.0, 1.0));
+      // Two-sided: light whichever side faces the viewer. Blend the two over a short range where the
+      // curl turns edge-on, rather than flipping the normal, which drew a hard 1px crease down the fold.
+      float side1 = smoothstep(-0.15, 0.15, normal.z);
+      float diffuse = mix(max(dot(-normal, light), 0.0), max(dot(normal, light), 0.0), side1);
+      float specular = mix(
+        pow(max(dot(-normal, halfway), 0.0), 22.0),
+        pow(max(dot(normal, halfway), 0.0), 22.0),
+        side1
+      );
+
+      float facingSigned = cos(vTwist);
+      vec3 colour = facingSigned > 0.0 ? front(k) : back(k) * 0.95;
+      float facing = abs(facingSigned);
 
       // Light: ambient + diffuse, then a soft white highlight.
-      colour *= 0.72 + 0.38 * vDiffuse;
+      colour *= 0.72 + 0.38 * diffuse;
       colour *= 0.78 + 0.22 * facing;
-      colour += vec3(vSpecular) * 0.55;
+      colour += vec3(specular) * 0.55;
 
-      // Fine silk threads, faded out where the ribbon is edge-on.
-      float threads = sin(v * 700.0 + sin(s * 30.0) * 1.5);
-      colour *= 1.0 + threads * 0.03 * facing;
+      // No fine thread texture: stripes a few pixels apart alias into a hatched, pixelated look.
+      // Instead, a dither below one colour step hides the 8-bit banding of these wide, soft gradients.
+      float noise = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715))));
+      colour += (noise - 0.5) / 255.0;
 
       // Soft edges, soft sweep-in front.
       float edge = smoothstep(0.0, 0.05, v) * smoothstep(1.0, 0.95, v);
@@ -182,8 +192,12 @@
       const ratio = Math.min(window.devicePixelRatio || 1, 2);
       const width = canvas.clientWidth;
       const height = canvas.clientHeight;
-      canvas.width = Math.round(width * ratio);
-      canvas.height = Math.round(height * ratio);
+      if (!width || !height) return;
+      // Resizing the drawing buffer clears it, so only do it when the size really changed.
+      const bufferWidth = Math.round(width * ratio);
+      const bufferHeight = Math.round(height * ratio);
+      if (canvas.width !== bufferWidth) canvas.width = bufferWidth;
+      if (canvas.height !== bufferHeight) canvas.height = bufferHeight;
       gl.viewport(0, 0, canvas.width, canvas.height);
 
       const aspect = width / height;
@@ -198,7 +212,10 @@
       gl.uniform1f(uniforms.width, Math.max(220, Math.min(width, 1600) * 0.3) / height);
     };
 
-    const draw = (seconds: number, reveal: number) => {
+    let reveal = reduce ? 1.2 : 0.1;
+
+    const draw = (seconds: number, nextReveal: number) => {
+      reveal = nextReveal;
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.uniform1f(uniforms.time, seconds);
@@ -236,10 +253,22 @@
     layout();
     if (reduce) draw(0, 1.2);
 
-    window.addEventListener("resize", () => {
+    // Keep the drawing buffer the size of the canvas on screen. The hero can change height without a
+    // window resize (web fonts loading, text wrapping), and a buffer left at the old size is stretched
+    // by the browser, which blurs the ribbon. Redraw at the current reveal so a resize never flashes
+    // the whole ribbon before its sweep-in.
+    const resize = () => {
       layout();
-      if (!running) draw(clock / 1000, 1.2);
-    });
+      if (!running) draw(clock / 1000, reveal);
+    };
+    new ResizeObserver(resize).observe(canvas);
+
+    // Moving the window to a screen with another pixel density changes no CSS size, so watch it apart.
+    const watchPixelRatio = () => {
+      window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`)
+        .addEventListener("change", () => { resize(); watchPixelRatio(); }, { once: true });
+    };
+    watchPixelRatio();
 
     if (!reduce) {
       new IntersectionObserver(([entry]) => (entry.isIntersecting ? start() : stop())).observe(canvas);

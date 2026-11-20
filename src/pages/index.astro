@@ -203,19 +203,19 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
       <section class="credibility" aria-label="Credibility">
         <a href="#open-source">
           <span class="stat"><strong data-count={pullRequests.length}>{pullRequests.length}</strong></span>
-          <span><b>merged open-source PRs</b>Kubescape · Home Assistant · PyPA · Terrakube</span>
+          <span><b>merged open-source PRs</b>Across 4 projects · Kubescape · Home Assistant · PyPA · Terrakube</span>
           <i aria-hidden="true">↓</i>
         </a>
-        <a href="https://github.com/kubescape/kubescape/pulls?q=is%3Apr+is%3Amerged+author%3AChanuth412-pixel" target="_blank" rel="noreferrer">
-          <span class="stat"><strong data-count="12" data-suffix="k">12k</strong><em aria-label="stars">★</em></span>
-          <span><b>Kubescape</b>Largest project I've shipped code to</span>
-          <i aria-hidden="true">↗</i>
+        <a href="#contact">
+          <span class="stat"><strong data-count="24" data-suffix="h">24h</strong></span>
+          <span><b>Reply time</b>Overlap with Europe and US mornings</span>
+          <i aria-hidden="true">↓</i>
         </a>
         <a href={profiles[2].href} target="_blank" rel="noreferrer">
           {upwork.rating ? (
             <>
               <span class="stat"><strong>{upwork.rating}</strong><em aria-label="out of 5 stars">★</em></span>
-              <span><b>Upwork rating</b>{upwork.jobSuccess ? `${upwork.jobSuccess} job success · ` : ""}2 client projects</span>
+              <span><b>Upwork rating</b>{upwork.jobSuccess ? `${upwork.jobSuccess} job success` : "2 client projects"}</span>
             </>
           ) : (
             <>

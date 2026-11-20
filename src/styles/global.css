@@ -1242,12 +1242,24 @@ a.media-frame--browser:focus-visible {
   place-items: center;
   width: 44px;
   height: 44px;
-  background: #fff;
+  background: var(--accent);
   border: 2px solid var(--accent);
   border-radius: 50%;
-  color: var(--accent);
+  color: #fff;
   font: 600 13px var(--font);
   font-variant-numeric: tabular-nums;
+}
+
+.js-anim .timeline-dot {
+  background: #fff;
+  color: var(--accent);
+  transition: background-color 0.35s ease, color 0.35s ease;
+  transition-delay: calc(0.2s + var(--i, 0) * 0.45s);
+}
+
+.js-anim .is-visible .timeline-dot {
+  background: var(--accent);
+  color: #fff;
 }
 
 .timeline h3 {

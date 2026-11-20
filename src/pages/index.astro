@@ -446,7 +446,7 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
           <p class="eyebrow">Contact</p>
           <h2>Have a system to improve?</h2>
           <p>Tell me what you need, and I’ll reply with the next sensible step.</p>
-          <a class="contact-email" href="mailto:chanuth412@gmail.com">chanuth412@gmail.com <span aria-hidden="true">↗</span></a>
+          <a class="contact-email" href="mailto:hello@chanuth.dev">hello@chanuth.dev <span aria-hidden="true">↗</span></a>
           <div class="social-links">
             {profiles.map((profile) => <a href={profile.href} target="_blank" rel="noreferrer">{profile.label} ↗</a>)}
             <a href={`${base}cv.pdf`} download>CV ↓</a>
@@ -470,7 +470,7 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
 
     <footer class="site-footer">
       <a class="brand" href={`${base}#top`}>CA<span>.</span></a>
-      <a href="mailto:chanuth412@gmail.com">chanuth412@gmail.com</a>
+      <a href="mailto:hello@chanuth.dev">hello@chanuth.dev</a>
       {profiles.map((profile) => <a href={profile.href} target="_blank" rel="noreferrer">{profile.label}</a>)}
       <a href={`${base}cv.pdf`} download>CV</a>
       <small>© {new Date().getFullYear()} Chanuth Abeynayake</small>
@@ -496,7 +496,7 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
       const body = encodeURIComponent(
         `Name: ${data.get("name")}\nEmail: ${data.get("email")}\nWhat I need: ${data.get("need")}\nBudget: ${data.get("budget")}\nTimeline: ${data.get("timeline")}`
       );
-      window.location.href = `mailto:chanuth412@gmail.com?subject=${subject}&body=${body}`;
+      window.location.href = `mailto:hello@chanuth.dev?subject=${subject}&body=${body}`;
       status.textContent = "Opening your email client…";
       return;
     }
@@ -513,7 +513,7 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
       status.textContent = "Thanks — your enquiry has been sent.";
     } catch (error) {
       console.error(error);
-      status.textContent = "Something went wrong. Please email chanuth412@gmail.com directly.";
+      status.textContent = "Something went wrong. Please email hello@chanuth.dev directly.";
     }
   });
 </script>

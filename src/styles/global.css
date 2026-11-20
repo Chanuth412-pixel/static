@@ -1146,6 +1146,27 @@ a.media-frame--browser:focus-visible {
   transform: translate(2px, -2px);
 }
 
+.pr-more {
+  margin-top: 12px;
+}
+
+.pr-more summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.pr-more summary::-webkit-details-marker {
+  display: none;
+}
+
+.pr-more-list {
+  margin-top: 12px;
+}
+
+.pr-more + .project-link {
+  margin-top: 24px;
+}
+
 /* ---------- Process timeline ---------- */
 .timeline {
   position: relative;

@@ -101,11 +101,11 @@ const linkIcon = (href: string, kind: string) => {
 
 // Merged open-source pull requests, newest first. Stars as of Nov 2026.
 const pullRequests = [
-  { repo: "kubescape/kubescape", name: "Kubescape", stars: "12k", lang: "Go", number: 5233, title: "Report latest-version lookup failures in the installer" },
+  { repo: "kubescape/kubescape", name: "Kubescape", stars: "12k", lang: "Go", number: 5233, title: "Report latest-version lookup failures in the installer", featured: true },
   { repo: "kubescape/kubescape", name: "Kubescape", stars: "12k", lang: "Go", number: 5177, title: "Correct the shell completion instructions" },
-  { repo: "pypa/build", name: "PyPA build", stars: "865", lang: "Python", number: 1283, title: "Fix the troubleshooting hint when build isolation is disabled" },
-  { repo: "terrakube-io/terrakube", name: "Terrakube", stars: "1k", lang: "Java", number: 3922, title: "Correctly remove a trailing .git from repository URLs" },
-  { repo: "home-assistant/home-assistant.io", name: "Home Assistant docs", stars: "10.2k", lang: "HTML", number: 50530, title: "Fix broken FAQ links" },
+  { repo: "pypa/build", name: "PyPA build", stars: "865", lang: "Python", number: 1283, title: "Fix the troubleshooting hint when build isolation is disabled", featured: true },
+  { repo: "terrakube-io/terrakube", name: "Terrakube", stars: "1k", lang: "Java", number: 3922, title: "Correctly remove a trailing .git from repository URLs", featured: true },
+  { repo: "home-assistant/home-assistant.io", name: "Home Assistant docs", stars: "10.2k", lang: "HTML", number: 50530, title: "Fix broken FAQ links", featured: true },
   { repo: "terrakube-io/terrakube", name: "Terrakube", stars: "1k", lang: "Java", number: 3921, title: "Fix the telemetry Docker Compose instructions" },
   { repo: "pypa/build", name: "PyPA build", stars: "865", lang: "Python", number: 1282, title: "Update macOS runners in the CI documentation" },
   { repo: "pypa/build", name: "PyPA build", stars: "865", lang: "Python", number: 1281, title: "Fix the missing src directory in the tutorial" },
@@ -368,10 +368,10 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
       <section class="section band reveal" id="open-source">
         <div class="section-heading">
           <div><p class="eyebrow">Open source</p><h2>Comfortable in other people's codebases.</h2></div>
-          <p>{pullRequests.length} merged fixes across {prProjects.length} projects, from Kubescape (12k★) to Home Assistant, each reviewed against the project's own standards.</p>
+          <p>{pullRequests.length} merged fixes across {prProjects.length} projects.</p>
         </div>
         <div class="pr-list" data-stagger>
-          {pullRequests.map((pr) => (
+          {pullRequests.filter((pr) => pr.featured).map((pr) => (
             <a class="pr-row" data-spotlight href={pr.href} target="_blank" rel="noreferrer" aria-label={`${pr.title} — ${pr.repo} pull request #${pr.number}, merged`}>
               <span class="pr-repo">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d={linkIcons.github} /></svg>
@@ -386,6 +386,26 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
             </a>
           ))}
         </div>
+        <details class="pr-more">
+          <summary class="project-link">Show 4 more</summary>
+          <div class="pr-list pr-more-list" data-stagger>
+            {pullRequests.filter((pr) => !pr.featured).map((pr) => (
+              <a class="pr-row" data-spotlight href={pr.href} target="_blank" rel="noreferrer" aria-label={`${pr.title} — ${pr.repo} pull request #${pr.number}, merged`}>
+                <span class="pr-repo">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d={linkIcons.github} /></svg>
+                  <span>{pr.name}<small>★ {pr.stars} · {pr.lang}</small></span>
+                </span>
+                <span class="pr-main">
+                  <strong>{pr.title}</strong>
+                  <small>#{pr.number}</small>
+                </span>
+                <em>Merged</em>
+                <span class="pr-arrow" aria-hidden="true">↗</span>
+              </a>
+            ))}
+          </div>
+        </details>
+        <a class="project-link" href="https://github.com/search?q=is%3Apr+is%3Amerged+author%3AChanuth412-pixel&type=pullrequests" target="_blank" rel="noreferrer">All merged PRs on GitHub <span aria-hidden="true">↗</span></a>
       </section>
 
       <section class="section reveal" id="process">

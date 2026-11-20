@@ -1319,13 +1319,16 @@ a.media-frame--browser:focus-visible {
 
 .social-links {
   display: flex;
+  flex-wrap: wrap;
   gap: 20px;
+  row-gap: 10px;
   margin-top: 22px;
 }
 
 .social-links a {
   color: #8fbcf0;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .contact-form {

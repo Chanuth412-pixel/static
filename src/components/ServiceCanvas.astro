@@ -304,6 +304,13 @@ const grafana = logo("Grafana");
     font: 0.78em var(--font);
   }
 
+  @container (max-width: 520px) {
+    .status em,
+    .env {
+      display: none;
+    }
+  }
+
   /* ---------- motion ---------- */
   :global(.js-anim) .canvas:not(:global(.is-in)) .card,
   :global(.js-anim) .canvas:not(:global(.is-in)) .env {

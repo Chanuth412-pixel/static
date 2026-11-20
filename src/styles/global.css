@@ -1481,7 +1481,7 @@ a.media-frame--browser:focus-visible {
   letter-spacing: -0.035em;
 }
 
-.stack-copy > p {
+.stack-copy > p:not(.eyebrow) {
   margin: 0;
   color: var(--body);
   font-size: 17px;

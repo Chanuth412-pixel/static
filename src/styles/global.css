@@ -670,7 +670,7 @@ a {
 }
 
 .service-link {
-  color: rgb(var(--tint));
+  color: var(--accent-strong);
   font-size: 15px;
   font-weight: 600;
   text-decoration: none;
@@ -687,7 +687,7 @@ a {
 }
 
 .service-link:focus-visible {
-  outline: 2px solid rgb(var(--tint));
+  outline: 2px solid var(--accent-strong);
   outline-offset: 4px;
   border-radius: 4px;
 }
@@ -849,7 +849,7 @@ a.media-frame--browser:focus-visible {
 }
 
 .case-copy dl div:last-child {
-  border-left-color: var(--sage);
+  border-left-color: var(--accent-strong);
 }
 
 .case-copy dt {
@@ -858,7 +858,7 @@ a.media-frame--browser:focus-visible {
 }
 
 .case-copy dl div:last-child dt {
-  color: var(--sage);
+  color: var(--accent-strong);
 }
 
 .case-copy dd {
@@ -1164,7 +1164,7 @@ a.media-frame--browser:focus-visible {
   left: 22px;
   width: calc(75% + 21px);
   height: 2px;
-  background: linear-gradient(90deg, var(--accent), var(--sage));
+  background: var(--accent);
   transform-origin: left;
   transition: transform 1.4s cubic-bezier(0.45, 0, 0.25, 1) 0.2s;
 }
@@ -1189,12 +1189,6 @@ a.media-frame--browser:focus-visible {
   color: var(--accent);
   font: 600 13px var(--font);
   font-variant-numeric: tabular-nums;
-}
-
-.timeline li:last-child .timeline-dot {
-  border-color: var(--sage);
-  background: var(--sage);
-  color: #fff;
 }
 
 .timeline h3 {

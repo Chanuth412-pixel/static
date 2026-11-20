@@ -165,7 +165,7 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
     <div class="site-shell header-inner">
       <a class="brand" href={`${base}#top`} aria-label="Chanuth Abeynayake home">CA<span>.</span></a>
       <nav aria-label="Main navigation">
-        <a href="#services">Services</a><a href="#work">Work</a><a href="#process">Process</a><a href="#contact">Contact</a>
+        <a href="#services">Services</a><a href="#work">Work</a><a href="#process">Process</a><a href="#about">About</a><a href="#contact">Contact</a>
       </nav>
       <a class="nav-cta" href="#contact">Get a quote <span aria-hidden="true">→</span></a>
     </div>
@@ -426,11 +426,19 @@ const toolByName = new Map(tools.map((tool) => [tool.name, tool]));
           <li>Based in Sri Lanka (UTC+5:30)</li>
           <li>Overlap with Europe and US mornings</li>
         </ul>
-        <p class="education">
-          Computer Engineering undergraduate at the University of Peradeniya.
-          Team lead in three hackathon finals: SLASSCOM Xcelerate, SLIIT CodeFest and SLT CodeBlast
-          (<a href={profiles[1].href} target="_blank" rel="noreferrer">LinkedIn ↗</a>).
-        </p>
+      </section>
+
+      <section class="section reveal about" id="about">
+        <img class="about-photo" src={`${base}me.webp`} alt="Chanuth Abeynayake" width="160" height="160" loading="lazy" decoding="async" />
+        <div class="about-copy">
+          <p class="eyebrow">About</p>
+          <h2>Chanuth Abeynayake</h2>
+          <p class="about-role">Freelance cloud &amp; AI engineer · Sri Lanka</p>
+          <p>I'm Chanuth, a freelance cloud and AI engineer. I set up infrastructure your team can run on its own, with Terraform, Kubernetes and monitoring from day one, and I build AI automation that plugs into real workflows. I also contribute fixes and features to open-source projects such as Kubescape.</p>
+          <p class="about-meta">Computer Engineering undergraduate at the University of Peradeniya.
+            Team lead in three hackathon finals: SLASSCOM Xcelerate, SLIIT CodeFest and SLT CodeBlast
+            (<a href={profiles[1].href} target="_blank" rel="noreferrer">LinkedIn ↗</a>).</p>
+        </div>
       </section>
 
       <section class="contact-panel reveal" id="contact">
